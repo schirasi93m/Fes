@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_project_fes/Core/Theme/app_colors.dart';
+import 'package:new_project_fes/core/theme/app_colors.dart';
 import 'package:new_project_fes/core/theme/app_offsets.dart';
 import 'package:new_project_fes/core/theme/app_sizes.dart';
 

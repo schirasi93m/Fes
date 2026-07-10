@@ -20,6 +20,7 @@ class AppIcons {
   static const search = LucideIcons.search;
   static const filter = LucideIcons.filter;
   static const refresh = LucideIcons.refreshCw;
+  static const close = LucideIcons.circleX;
 
   //==========================
   // Navigation

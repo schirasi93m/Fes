@@ -68,7 +68,7 @@ class AppSidebarUser extends StatelessWidget {
                     Text(
                       fullName,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.sidebarItem,
+                      style: AppTextStyles.sidebarItem.copyWith(color: AppColors.surface),
                     ),
 
                     const SizedBox(height: AppSpacing.xs),
