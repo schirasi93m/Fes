@@ -41,7 +41,7 @@ class AppSizes {
 
   // Logo
   static const double logoSize = 48;
-  
+
   // Avatar
   static const double avatarSm = 32;
   static const double avatarMd = 40;
@@ -64,4 +64,9 @@ class AppSizes {
   static const double progressIndicatorSm = 18;
   static const double progressIndicatorMd = 20;
   static const double progressIndicatorLg = 24;
+
+  // Footer
+  static const double footerHeight = 28;
+  // UserSideBar
+  static const double avatarRadius = 20;
 }

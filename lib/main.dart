@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_project_fes/Core/Theme/app_theme.dart';
+import 'package:new_project_fes/core/theme/app_theme.dart';
 import 'package:new_project_fes/dashboard/main_screen.dart';
 //import 'package:new_project_fes/dashboard/main_screen.dart';
 //import 'package:new_project_fes/playground/component_playground.dart';

@@ -20,7 +20,7 @@ class AppHeader extends StatelessWidget {
       height: AppSizes.appBarHeight,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.headerBackground,
         boxShadow: AppShadows.card,
       ),
       child: Row(
@@ -41,9 +41,6 @@ class AppHeader extends StatelessWidget {
           //------------------------
           Text(title, style: AppTextStyles.sidebarTitle),
 
-          //------------------------
-          // Center
-          //------------------------
           const Spacer(),
 
           //------------------------
@@ -55,35 +52,10 @@ class AppHeader extends StatelessWidget {
             type: AppButtonType.text,
           ),
 
-          const SizedBox(width: AppSpacing.sm),
-
           //------------------------
-          // User
+          // Center
           //------------------------
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 16,
-                child: Icon(AppIcons.user, size: AppSizes.iconMd),
-              ),
-
-              const SizedBox(width: AppSpacing.sm),
-
-              Text("مصطفی شیرازی", style: AppTextStyles.bodyLarge
-),
-            ],
-          ),
-
           const SizedBox(width: AppSpacing.md),
-
-          //------------------------
-          // Logout
-          //------------------------
-          AppButton(
-            icon: AppIcons.logout,
-            onPressed: () {},
-            type: AppButtonType.text,
-          ),
         ],
       ),
     );

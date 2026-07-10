@@ -28,6 +28,17 @@ class AppColors {
 
   static const Color onPrimary = Colors.white;
   static const Color onSurface = textPrimary;
+  // ======================
+  // Layout
+  // ======================
+
+  static const Color headerBackground = Color(0xFF1F2937);
+
+  static const Color sidebarBackground = Color(0xFF1F2937);
+
+  static const Color footerBackground = Color(0xFF1F2937);
+
+  static const Color pageBackground = Color(0xFFF8FAFC);
 
   //==========================
   // Border
@@ -62,7 +73,15 @@ class AppColors {
   // Sidebar
   //==========================
 
-  static const Color sidebarBackground = Color(0xFFFFFFFF);
+  static const Color sidebarItemBackground = Color(0xFF374151);
+
+  static const Color sidebarText = Color(0xFFF9FAFB);
+
+  static const Color sidebarTextSecondary = Color(0xFFD1D5DB);
+
+  static const Color sidebarDivider = Color(0xFF374151);
+  static const Color transparent = Colors.transparent;
+  static const Color none = Colors.transparent;
   static const Color sidebarItem = Color(0xFF424242);
   static const Color sidebarItemHover = Color(0xFFF5F5F5);
   static const Color sidebarItemSelected = primary;
@@ -72,7 +91,7 @@ class AppColors {
   //==========================
 
   static const Color appBarBackground = Colors.white;
-  static const Color appBarTitle = Color(0xFF212121);
+  static const Color appBarTitle = AppColors.sidebarText;
 
   //==========================
   // Company
@@ -104,22 +123,22 @@ class AppColors {
   static const Color dangerBackground = Color(0xFFFFEBEE);
   static const Color infoBackground = Color(0xFFE3F2FD);
 
-//==========================
-// Shadow
-//==========================
+  //==========================
+  // Shadow
+  //==========================
 
-static const Color shadowLight = Color(0x14000000);
+  static const Color shadowLight = Color(0x14000000);
 
-static const Color shadowMedium = Color(0x22000000);
+  static const Color shadowMedium = Color(0x22000000);
 
-static const Color shadowDark = Color(0x33000000);
+  static const Color shadowDark = Color(0x33000000);
 
-//==========================
-// Basic Colors
-//==========================
+  //==========================
+  // Basic Colors
+  //==========================
 
-static const Color black = Colors.black;
+  static const Color black = Colors.black;
 
-// برای سازگاری با کدهای قبلی
-static const Color Black = Colors.black;
+  // برای سازگاری با کدهای قبلی
+  static const Color Black = Colors.black;
 }

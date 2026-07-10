@@ -69,19 +69,19 @@ class AppButton extends StatelessWidget {
         break;
 
       case AppButtonType.outlined:
-        bgColor = Colors.transparent;
+        bgColor = AppColors.none; 
         fgColor = foregroundColor ?? AppColors.primary;
         border = BorderSide(color: fgColor);
         break;
 
       case AppButtonType.text:
-        bgColor = Colors.transparent;
+        bgColor = AppColors.none;
         fgColor = foregroundColor ?? AppColors.primary;
         border = BorderSide.none;
         break;
 
       case AppButtonType.icon:
-        bgColor = Colors.transparent;
+        bgColor = AppColors.none;
         fgColor = foregroundColor ?? AppColors.primary;
         border = BorderSide.none;
         break;
@@ -182,8 +182,8 @@ class AppButton extends StatelessWidget {
           backgroundColor: bgColor,
           foregroundColor: fgColor,
 
-          disabledBackgroundColor: AppColors.border,
-          disabledForegroundColor: AppColors.disabled,
+          disabledBackgroundColor: AppColors.none,
+          disabledForegroundColor: AppColors.none,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.button),
             side: border,

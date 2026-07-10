@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:new_project_fes/core/theme/app_colors.dart';
+import 'package:new_project_fes/core/theme/app_icons.dart';
 import 'package:new_project_fes/core/theme/app_radius.dart';
 import 'package:new_project_fes/core/theme/app_spacing.dart';
 import 'package:new_project_fes/core/theme/app_text_style.dart';
@@ -58,16 +59,16 @@ class StatusBadge extends StatelessWidget {
   IconData get _defaultIcon {
     switch (type) {
       case StatusBadgeType.success:
-        return Icons.check_circle;
+        return AppIcons.success;
 
       case StatusBadgeType.warning:
-        return Icons.warning_rounded;
+        return AppIcons.warning;
 
       case StatusBadgeType.error:
-        return Icons.cancel;
+        return AppIcons.cancel;
 
       case StatusBadgeType.info:
-        return Icons.info;
+        return AppIcons.info;
     }
   }
 

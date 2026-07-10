@@ -1,4 +1,3 @@
-
 class AppSpacing {
   AppSpacing._(); // جلوگیری از ساختن نمونه
 
@@ -21,4 +20,8 @@ class AppSpacing {
   static const double xxl = 48;
 
   static const double xxxl = 64;
+
+
+
+  static const double bigSpace = 150;
 }
