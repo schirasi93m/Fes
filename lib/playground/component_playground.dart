@@ -260,13 +260,35 @@ class _ComponentShowcaseState extends State<ComponentShowcase> {
 
             AppTable(
               columns: const [
-                AppTableColumn(title: "نام", width: 200),
-                AppTableColumn(title: "موبایل", width: 200),
-                AppTableColumn(title: "شهر", width: 180),
+                AppTableColumn(title: "نام", width: 220),
+                AppTableColumn(title: "موبایل", width: 180),
+                AppTableColumn(title: "شرکت", width: 220),
+                AppTableColumn(title: "وضعیت", width: 120),
+                AppTableColumn(title: "عملیات", width: 120),
               ],
-              rows: const [
-                [Text("مصطفی"), Text("09121234567"), Text("کاشان")],
-                [Text("علی"), Text("09120000000"), Text("تهران")],
+              rows: [
+                const [
+                  Text("مصطفی شیرازی"),
+                  Text("09121234567"),
+                  Text("ایمن شهر"),
+                  
+                  Text("فعال"),
+                  Icon(Icons.edit),
+                ],
+                const [
+                  Text("علی رضایی"),
+                  Text("09123334444"),
+                  Text("شرکت آلفا"),
+                  Text("غیرفعال"),
+                  Icon(Icons.edit),
+                ],
+                const [
+                  Text("رضا محمدی"),
+                  Text("09125556666"),
+                  Text("شرکت بتا"),
+                  Text("فعال"),
+                  Icon(Icons.edit),
+                ],
               ],
             ),
 

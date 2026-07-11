@@ -97,6 +97,12 @@ class AppSidebar extends StatelessWidget {
                     title: "تنظیمات",
                     icon: AppIcons.settings,
                   ),
+                  _buildItem(
+                    index: 6,
+                    title: "کامپونت هاش",
+                    icon: AppIcons.playground,
+                  ),
+
                   AppSidebarUser(
                     expanded: expanded,
                     fullName: "مصطفی شیرازی",

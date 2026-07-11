@@ -100,4 +100,6 @@ class AppIcons {
   static const camera = LucideIcons.camera;
   static const bell = LucideIcons.bell;
   static const menu = LucideIcons.menu;
+
+  static const playground = LucideIcons.flaskConical;
 }

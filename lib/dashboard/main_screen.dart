@@ -6,6 +6,7 @@ import 'package:new_project_fes/core/widgets/app_header.dart';
 import 'package:new_project_fes/core/widgets/app_sidebar.dart';
 
 import 'package:new_project_fes/features/customers/pages/customers_page.dart';
+import 'package:new_project_fes/playground/component_playground.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -22,6 +23,7 @@ enum NavigationPage {
   reports,
   settings,
 }
+
 class _MainScreenState extends State<MainScreen> {
   int selectedIndex = 0;
 
@@ -47,6 +49,9 @@ class _MainScreenState extends State<MainScreen> {
       case 5:
         return "تنظیمات";
 
+      case 6:
+        return "کامپونت ها ";
+
       default:
         return "";
     }
@@ -55,32 +60,26 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildPage() {
     switch (selectedIndex) {
       case 0:
-        return const Center(
-          child: Text("داشبورد"),
-        );
+        return const Center(child: Text("داشبورد"));
 
       case 1:
         return const CustomersPage();
 
       case 2:
-        return const Center(
-          child: Text("شرکت‌ها"),
-        );
+        return const Center(child: Text("شرکت‌ها"));
 
       case 3:
-        return const Center(
-          child: Text("سرویس‌ها"),
-        );
+        return const Center(child: Text("سرویس‌ها"));
 
       case 4:
-        return const Center(
-          child: Text("گزارشات"),
-        );
+        return const Center(child: Text("گزارشات"));
 
       case 5:
-        return const Center(
-          child: Text("تنظیمات"),
-        );
+        return const Center(child: Text("تنظیمات"));
+
+        
+      case 6:
+        return const ComponentShowcase();
 
       default:
         return const SizedBox.shrink();
@@ -116,9 +115,7 @@ class _MainScreenState extends State<MainScreen> {
                     },
                   ),
 
-                  Expanded(
-                    child: _buildPage(),
-                  ),
+                  Expanded(child: _buildPage()),
                 ],
               ),
             ),

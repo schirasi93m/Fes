@@ -107,7 +107,7 @@ class AppColors {
   static const Color tableRow = Colors.white;
   static const Color tableRowHover = Color(0xFFF5F5F5);
   static const Color tableRowSelected = Color(0xFFFFF3E0);
-
+  static const Color tableAlternateRow = Color(0xffF8F9FB);
   //==========================
   // Dialog
   //==========================
