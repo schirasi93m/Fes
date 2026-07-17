@@ -12,15 +12,17 @@ import 'package:new_project_fes/core/widgets/app_text_field.dart';
 import 'package:new_project_fes/core/widgets/status_badge.dart';
 import 'package:new_project_fes/core/theme/app_icons.dart';
 
+import 'package:new_project_fes/core/widgets/app_search_box.dart';
+
 class ComponentShowcase extends StatefulWidget {
   const ComponentShowcase({super.key});
-
   @override
   State<ComponentShowcase> createState() => _ComponentShowcaseState();
 }
 
 class _ComponentShowcaseState extends State<ComponentShowcase> {
   int? selectedType = 2;
+  final TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -256,6 +258,11 @@ class _ComponentShowcaseState extends State<ComponentShowcase> {
             //-------------------------------------
             //     Table
             //---------------------------------------
+            AppSearchBox(controller: searchController!),
+            const SizedBox(height: AppSpacing.xxl),
+            //-------------------------------------
+            //     Table
+            //---------------------------------------
             _title("Table"),
 
             AppTable(
@@ -271,7 +278,7 @@ class _ComponentShowcaseState extends State<ComponentShowcase> {
                   Text("مصطفی شیرازی"),
                   Text("09121234567"),
                   Text("ایمن شهر"),
-                  
+
                   Text("فعال"),
                   Icon(Icons.edit),
                 ],

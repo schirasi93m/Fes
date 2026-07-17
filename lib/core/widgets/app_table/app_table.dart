@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:new_project_fes/core/models/app_table_column.dart';
 import 'package:new_project_fes/core/theme/app_colors.dart';
 import 'package:new_project_fes/core/theme/app_radius.dart';
-import 'package:new_project_fes/core/theme/app_spacing.dart';
 import 'package:new_project_fes/core/theme/app_text_style.dart';
+
+import 'app_table_cell.dart';
+import 'app_table_row.dart';
 
 class AppTable extends StatelessWidget {
   final List<AppTableColumn> columns;
@@ -37,15 +39,9 @@ class AppTable extends StatelessWidget {
       color: AppColors.tableAlternateRow,
       child: Row(
         children: columns.map((column) {
-          return SizedBox(
+          return AppTableCell(
             width: column.width,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.lg,
-              ),
-              child: Text(column.title, style: AppTextStyles.titleMedium),
-            ),
+            child: Text(column.title, style: AppTextStyles.titleMedium),
           );
         }).toList(),
       ),
@@ -54,45 +50,11 @@ class AppTable extends StatelessWidget {
 
   Widget _buildBody() {
     return Column(
-      children: List.generate(rows.length, (rowIndex) {
-        final row = rows[rowIndex];
-
-        return MouseRegion(
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              bool hovering = false;
-
-              return MouseRegion(
-                onEnter: (_) => setState(() => hovering = true),
-                onExit: (_) => setState(() => hovering = false),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  decoration: BoxDecoration(
-                    color: hovering
-                        ? AppColors.sidebarItemBackground
-                        : rowIndex.isEven
-                        ? AppColors.surface
-                        : AppColors.tableAlternateRow,
-                    border: Border(top: BorderSide(color: AppColors.border)),
-                  ),
-                  child: Row(
-                    children: List.generate(columns.length, (columnIndex) {
-                      return SizedBox(
-                        width: columns[columnIndex].width,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md,
-                            vertical: AppSpacing.lg,
-                          ),
-                          child: row[columnIndex],
-                        ),
-                      );
-                    }),
-                  ),
-                ),
-              );
-            },
-          ),
+      children: List.generate(rows.length, (index) {
+        return AppTableRow(
+          row: rows[index],
+          columns: columns,
+          isEven: index.isEven,
         );
       }),
     );

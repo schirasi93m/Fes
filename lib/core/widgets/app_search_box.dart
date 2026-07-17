@@ -7,7 +7,7 @@ import '../theme/app_sizes.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_style.dart';
 
-class AppSearchBox extends StatelessWidget {
+class AppSearchBox extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final ValueChanged<String>? onChanged;
@@ -22,15 +22,48 @@ class AppSearchBox extends StatelessWidget {
   });
 
   @override
+  State<AppSearchBox> createState() => _AppSearchBoxState();
+}
+
+class _AppSearchBoxState extends State<AppSearchBox> {
+  @override
+  void initState() {
+    super.initState();
+    // با هر تغییر متن (حتی برنامه‌ای، نه فقط تایپ کاربر) دوباره build میشه
+    // تا آیکون × همیشه با وضعیت واقعی controller هماهنگ بمونه.
+    widget.controller.addListener(_onControllerChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant AppSearchBox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_onControllerChanged);
+      widget.controller.addListener(_onControllerChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onControllerChanged);
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    // فقط برای rebuild کردن خود ویجت لازمه، چیزی داخلش تغییر نمی‌کنه.
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: AppSizes.textFieldHeight,
       child: TextField(
-        controller: controller,
-        onChanged: onChanged,
+        controller: widget.controller,
+        onChanged: widget.onChanged,
         style: AppTextStyles.bodyMedium,
         decoration: InputDecoration(
-          hintText: hintText,
+          hintText: widget.hintText,
 
           hintStyle: AppTextStyles.bodyMedium.copyWith(
             color: AppColors.textSecondary,
@@ -41,14 +74,14 @@ class AppSearchBox extends StatelessWidget {
 
           prefixIcon: Icon(AppIcons.search, color: AppColors.textSecondary),
 
-          suffixIcon: controller.text.isNotEmpty
+          suffixIcon:widget. controller.text.isNotEmpty
               ? IconButton(
                   icon: Icon(AppIcons.close, color: AppColors.textSecondary),
                   onPressed: () {
-                    controller.clear();
+                    widget. controller.clear();
 
-                    if (onClear != null) {
-                      onClear!();
+                    if (widget. onClear != null) {
+                      widget. onClear!();
                     }
                   },
                 )

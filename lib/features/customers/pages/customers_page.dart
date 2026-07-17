@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:new_project_fes/core/models/app_table_column.dart';
+import 'package:new_project_fes/core/theme/app_icons.dart';
+import 'package:new_project_fes/core/theme/app_sizes.dart';
+import 'package:new_project_fes/core/widgets/app_button.dart';
 import 'package:new_project_fes/core/widgets/app_table/app_table.dart';
-
+import 'package:new_project_fes/core/widgets/status_badge.dart';
+import 'package:new_project_fes/features/customers/widgets/customer_form_dialog.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_page_toolbar.dart';
 
@@ -37,7 +41,9 @@ class _CustomersPageState extends State<CustomersPage> {
 
             primaryButtonText: "مشتری جدید",
 
-            onPrimaryPressed: () {},
+            onPrimaryPressed: () {
+              CustomerDialog.show(context);
+            },
 
             onSearchChanged: (value) {},
           ),
@@ -48,7 +54,7 @@ class _CustomersPageState extends State<CustomersPage> {
                 AppTableColumn(title: "نام مشتری", width: 220),
                 AppTableColumn(title: "موبایل", width: 180),
                 AppTableColumn(title: "شرکت", width: 220),
-                AppTableColumn(title: "وضعیت", width: 120),
+                AppTableColumn(title: "وضعیت", width: 150),
                 AppTableColumn(title: "عملیات", width: 150),
               ],
               rows: [
@@ -56,22 +62,34 @@ class _CustomersPageState extends State<CustomersPage> {
                   const Text("مصطفی شیرازی"),
                   const Text("09121234567"),
                   const Text("ایمن شهر"),
-                  const Text("فعال"),
+                  StatusBadge(text: "فعال", type: StatusBadgeType.success),
+
                   const Text("✏️"),
                 ],
                 [
                   const Text("علی رضایی"),
                   const Text("09123334444"),
                   const Text("شرکت آلفا"),
-                  const Text("غیرفعال"),
-                  const Text("✏️"),
+                  StatusBadge(text: "غیر فعال", type: StatusBadgeType.success),
+
+                  AppButton(
+                    icon: AppIcons.edit,
+                    type: AppButtonType.text,
+                    onPressed: () {},
+                  ),
                 ],
                 [
                   const Text("رضا محمدی"),
                   const Text("09125556666"),
                   const Text("شرکت بتا"),
-                  const Text("فعال"),
-                  const Text("✏️"),
+
+                  StatusBadge(text: "فعال", type: StatusBadgeType.success),
+
+                  AppButton(
+                    icon: AppIcons.edit,
+                    type: AppButtonType.icon,
+                    onPressed: () {},
+                  ),
                 ],
               ],
             ),
