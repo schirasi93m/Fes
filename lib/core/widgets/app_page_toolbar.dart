@@ -18,6 +18,7 @@ class PageToolbar extends StatelessWidget {
   final bool showExcel;
   final bool showPdf;
   final bool showPrint;
+  final bool showSreachBox;
 
   final VoidCallback? onFilterPressed;
   final VoidCallback? onRefreshPressed;
@@ -44,6 +45,7 @@ class PageToolbar extends StatelessWidget {
     this.showExcel = false,
     this.showPdf = false,
     this.showPrint = false,
+    this.showSreachBox = true,
 
     this.onFilterPressed,
     this.onRefreshPressed,
@@ -70,15 +72,15 @@ class PageToolbar extends StatelessWidget {
           //==========================
           // Search
           //==========================
-          if (searchController != null)
-            SizedBox(
-              width: 320,
+          if (showSreachBox)
+            Flexible(
               child: AppSearchBox(
                 controller: searchController!,
                 hintText: searchHint,
                 onChanged: onSearchChanged,
               ),
             ),
+          
 
           if (searchController != null) const SizedBox(width: AppSpacing.md),
 

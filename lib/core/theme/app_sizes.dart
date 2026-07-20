@@ -70,3 +70,13 @@ class AppSizes {
   // UserSideBar
   static const double avatarRadius = 20;
 }
+
+class AppTableSizes {
+  AppTableSizes._();
+
+  static const double customerName = 220;
+  static const double customerPhone = 180;
+  static const double customerAddress = 320;
+  static const double customerStatus = 150;
+  static const double customerActions = 120;
+}
