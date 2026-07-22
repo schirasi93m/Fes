@@ -69,6 +69,11 @@ class AppSizes {
   static const double footerHeight = 28;
   // UserSideBar
   static const double avatarRadius = 20;
+
+  // Notifer
+  static const double notiferWithXl = 12;
+  static const double notificationWidth = 360;
+  static const double notificationElevation = 4;
 }
 
 class AppTableSizes {

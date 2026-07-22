@@ -4,6 +4,7 @@ import 'package:new_project_fes/core/theme/app_colors.dart';
 import 'package:new_project_fes/core/theme/app_sizes.dart';
 import 'package:new_project_fes/core/theme/app_spacing.dart';
 import 'package:new_project_fes/core/widgets/app_button.dart';
+import 'package:new_project_fes/core/widgets/app_notifier.dart';
 import 'package:new_project_fes/core/widgets/app_text_field.dart';
 
 import '../models/customer_model.dart';
@@ -37,13 +38,32 @@ class _CustomerDialogState extends State<CustomerDialog> {
   }
 
   void _submit() {
+    final fullName = fullNameController.text.trim();
+    final phone = phoneController.text.trim();
+    final address = addressController.text.trim();
+
+    if (fullName.isEmpty) {
+      AppNotifier.warning(context, "نام مشتری را وارد کنید.");
+      return;
+    }
+
+    if (phone.isEmpty) {
+      AppNotifier.warning(context, "شماره تماس را وارد کنید.");
+      return;
+    }
+
+    if (phone.length != 11) {
+      AppNotifier.warning(context, "شماره تماس باید ۱۱ رقم باشد.");
+      return;
+    }
+
     final customer = CustomerModel(
-      fullName: fullNameController.text.trim(),
-      phone: phoneController.text.trim(),
-      address: addressController.text.trim(),
+      fullName: fullName,
+      phone: phone,
+      address: address,
     );
 
-    Navigator.of(context).pop(customer);
+    Navigator.pop(context, customer);
   }
 
   @override
@@ -57,13 +77,17 @@ class _CustomerDialogState extends State<CustomerDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             AppTextField(controller: fullNameController, label: "نام کامل"),
+
             const SizedBox(height: AppSpacing.md),
+
             AppTextField(
               controller: phoneController,
               label: "شماره تماس",
               keyboardType: TextInputType.phone,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
+
+            const SizedBox(height: AppSpacing.md),
 
             AppTextField(
               controller: addressController,
@@ -78,7 +102,7 @@ class _CustomerDialogState extends State<CustomerDialog> {
           text: "انصراف",
           type: AppButtonType.filled,
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pop(context);
           },
         ),
         AppButton(text: "ثبت", onPressed: _submit),

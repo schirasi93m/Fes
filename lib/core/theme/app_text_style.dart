@@ -21,9 +21,7 @@ class AppTextStyles {
     color: AppColors.companyName,
   );
 
-  static const TextStyle logo = TextStyle(
-    fontSize: 40,
-  );
+  static const TextStyle logo = TextStyle(fontSize: 40);
 
   // =========================
   // Sidebar
@@ -115,5 +113,15 @@ class AppTextStyles {
     fontSize: 16,
     fontWeight: FontWeight.bold,
     color: AppColors.onPrimary,
+  );
+
+  // =========================
+  // Notifer
+  // =========================
+  static const TextStyle notification = TextStyle(
+    fontFamily: 'Vazirmatn',
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
   );
 }
