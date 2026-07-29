@@ -1,9 +1,12 @@
+import 'package:new_project_fes/core/enums/entity_state.dart';
+
 class CustomerModel {
   final int? id;
   final String fullName;
   final String phone;
   final String address;
   final bool isActive;
+  final EntityState entityState;
 
   const CustomerModel({
     this.id,
@@ -11,6 +14,7 @@ class CustomerModel {
     required this.phone,
     required this.address,
     this.isActive = true,
+    this.entityState = EntityState.inserted,
   });
 
   CustomerModel copyWith({
@@ -19,6 +23,7 @@ class CustomerModel {
     String? phone,
     String? address,
     bool? isActive,
+    EntityState? entityState,
   }) {
     return CustomerModel(
       id: id ?? this.id,
@@ -26,6 +31,7 @@ class CustomerModel {
       phone: phone ?? this.phone,
       address: address ?? this.address,
       isActive: isActive ?? this.isActive,
+      entityState: entityState ?? this.entityState,
     );
   }
 
@@ -36,6 +42,7 @@ class CustomerModel {
       'phone': phone,
       'address': address,
       'isActive': isActive,
+      'entityState': entityState.index,
     };
   }
 
@@ -46,6 +53,8 @@ class CustomerModel {
       phone: map['phone'] ?? '',
       address: map['address'] ?? '',
       isActive: map['isActive'] ?? true,
+      entityState:
+          EntityState.values[map['entityState'] ?? EntityState.unchanged.index],
     );
   }
 }

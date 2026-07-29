@@ -10,13 +10,23 @@ import 'package:new_project_fes/core/widgets/app_text_field.dart';
 import '../models/customer_model.dart';
 
 class CustomerDialog extends StatefulWidget {
-  const CustomerDialog({super.key});
+  final CustomerModel? customer;
 
-  static Future<CustomerModel?> show(BuildContext context) {
+  const CustomerDialog({
+    super.key,
+    this.customer,
+  });
+
+  static Future<CustomerModel?> show(
+    BuildContext context, {
+    CustomerModel? customer,
+  }) {
     return showDialog<CustomerModel>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const CustomerDialog(),
+      builder: (_) => CustomerDialog(
+        customer: customer,
+      ),
     );
   }
 
@@ -25,9 +35,29 @@ class CustomerDialog extends StatefulWidget {
 }
 
 class _CustomerDialogState extends State<CustomerDialog> {
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
+  final TextEditingController fullNameController =
+      TextEditingController();
+
+  final TextEditingController phoneController =
+      TextEditingController();
+
+  final TextEditingController addressController =
+      TextEditingController();
+
+  bool get isEditMode => widget.customer != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final customer = widget.customer;
+
+    if (customer != null) {
+      fullNameController.text = customer.fullName;
+      phoneController.text = customer.phone;
+      addressController.text = customer.address;
+    }
+  }
 
   @override
   void dispose() {
@@ -43,51 +73,82 @@ class _CustomerDialogState extends State<CustomerDialog> {
     final address = addressController.text.trim();
 
     if (fullName.isEmpty) {
-      AppNotifier.warning(context, "نام مشتری را وارد کنید.");
+      AppNotifier.warning(
+        context,
+        "نام مشتری را وارد کنید.",
+      );
       return;
     }
 
     if (phone.isEmpty) {
-      AppNotifier.warning(context, "شماره تماس را وارد کنید.");
+      AppNotifier.warning(
+        context,
+        "شماره تماس را وارد کنید.",
+      );
       return;
     }
 
     if (phone.length != 11) {
-      AppNotifier.warning(context, "شماره تماس باید ۱۱ رقم باشد.");
+      AppNotifier.warning(
+        context,
+        "شماره تماس باید ۱۱ رقم باشد.",
+      );
       return;
     }
 
+    final oldCustomer = widget.customer;
+
     final customer = CustomerModel(
+      id: oldCustomer?.id,
       fullName: fullName,
       phone: phone,
       address: address,
+      isActive: oldCustomer?.isActive ?? true,
     );
 
-    Navigator.pop(context, customer);
+    Navigator.pop(
+      context,
+      customer,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.surface,
-      title: const Text("مشتری جدید"),
+
+      title: Text(
+        isEditMode
+            ? "ویرایش مشتری"
+            : "مشتری جدید",
+      ),
+
       content: SizedBox(
         width: AppSizes.dialogWidth,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            AppTextField(controller: fullNameController, label: "نام کامل"),
+            AppTextField(
+              controller: fullNameController,
+              label: "نام کامل",
+            ),
 
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(
+              height: AppSpacing.md,
+            ),
 
             AppTextField(
               controller: phoneController,
               label: "شماره تماس",
               keyboardType: TextInputType.phone,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
             ),
 
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(
+              height: AppSpacing.md,
+            ),
 
             AppTextField(
               controller: addressController,
@@ -97,6 +158,7 @@ class _CustomerDialogState extends State<CustomerDialog> {
           ],
         ),
       ),
+
       actions: [
         AppButton(
           text: "انصراف",
@@ -105,7 +167,13 @@ class _CustomerDialogState extends State<CustomerDialog> {
             Navigator.pop(context);
           },
         ),
-        AppButton(text: "ثبت", onPressed: _submit),
+
+        AppButton(
+          text: isEditMode
+              ? "ذخیره تغییرات"
+              : "ثبت",
+          onPressed: _submit,
+        ),
       ],
     );
   }

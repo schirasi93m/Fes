@@ -74,15 +74,15 @@ class _AppSearchBoxState extends State<AppSearchBox> {
 
           prefixIcon: Icon(AppIcons.search, color: AppColors.textSecondary),
 
-          suffixIcon:widget. controller.text.isNotEmpty
+          suffixIcon: widget.controller.text.isNotEmpty
               ? IconButton(
                   icon: Icon(AppIcons.close, color: AppColors.textSecondary),
                   onPressed: () {
-                    widget. controller.clear();
+                    widget.controller.clear();
 
-                    if (widget. onClear != null) {
-                      widget. onClear!();
-                    }
+                    widget.onChanged?.call('');
+
+                    widget.onClear?.call();
                   },
                 )
               : null,
