@@ -11,17 +11,26 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  http: ^1.2.2
   cupertino_icons: ^1.0.8
   persian_datetime_picker: ^3.2.0
   flutter_localizations:
     sdk: flutter
   lucide_icons_flutter: ^3.1.14+2
-  
+  flutter_secure_storage: ^10.3.1
+  shared_preferences: ^2.5.5
+  path_provider: ^2.1.6
+  file_picker: ^11.0.2
+  dio: ^5.11.0
+  json_annotation: ^4.9.0
+  intl: ^0.20.2
+  responsive_framework: ^1.5.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner: ^2.15.1
+  json_serializable: ^6.14.0  
 
   flutter_lints: ^6.0.0
 

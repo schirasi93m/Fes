@@ -129,7 +129,7 @@ class AppTable extends StatelessWidget {
           AppButton(
             type: AppButtonType.icon,
             icon: AppIcons.edit,
-            tooltip: 'ویرایش کاربر',
+            tooltip: 'ویرایش',
             onPressed: () {
               onEdit?.call(rowIndex);
             },
@@ -138,7 +138,7 @@ class AppTable extends StatelessWidget {
           AppButton(
             type: AppButtonType.icon,
             icon: AppIcons.delete,
-            tooltip: 'حدف کاربر',
+            tooltip: 'حدف',
             onPressed: () {
               onDelete?.call(rowIndex);
             },

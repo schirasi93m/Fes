@@ -1,47 +1,30 @@
-import 'package:new_project_fes/core/enums/entity_state.dart';
-
 import '../models/customer_model.dart';
+import '../repository/customer_repository.dart';
 import '../services/customer_service.dart';
+
 class CustomerController {
-final CustomerService _service = CustomerService();
-  final List<CustomerModel> _customers = [];
-  List<CustomerModel> get customers => List.unmodifiable(_customers);
+  final CustomerRepository _repository;
+  final CustomerService _service = CustomerService();
 
-  void add(CustomerModel customer) {
-  _service.validate(customer);
+  CustomerController(this._repository);
 
-  _customers.add(
-    customer.copyWith(
-      entityState: EntityState.inserted,
-    ),
-  );
-}
-
-  void update(CustomerModel customer) {
-    final index = _customers.indexWhere((e) => e.id == customer.id);
-
-    if (index == -1) return;
-
-    _customers[index] = customer.copyWith(
-      entityState: EntityState.modified,
-    );
+  Future<List<CustomerModel>> getAll() async {
+    return await _repository.getList();
   }
 
-  void remove(CustomerModel customer) {
-    final index = _customers.indexWhere((e) => e.id == customer.id);
+  Future<CustomerModel> add(CustomerModel customer) async {
+    _service.validate(customer);
 
-    if (index == -1) return;
-
-    if (customer.id == null) {
-      _customers.removeAt(index);
-    } else {
-      _customers[index] = customer.copyWith(
-        entityState: EntityState.deleted,
-      );
-    }
+    return await _repository.insert(customer);
   }
 
-  void clear() {
-    _customers.clear();
+  Future<CustomerModel> update(CustomerModel customer) async {
+    _service.validate(customer);
+
+    return await _repository.update(customer);
+  }
+
+  Future<void> remove(CustomerModel customer) async {
+    await _repository.delete(customer);
   }
 }

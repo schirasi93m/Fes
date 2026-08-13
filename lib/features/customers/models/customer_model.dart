@@ -35,6 +35,23 @@ class CustomerModel {
     );
   }
 
+  // اطلاعات مورد نیاز API
+  Map<String, dynamic> toApiMap() {
+    final map = <String, dynamic>{
+      'fullName': fullName,
+      'phone': phone,
+      'address': address,
+      'isActive': isActive,
+    };
+
+    if (id != null) {
+      map['id'] = id;
+    }
+
+    return map;
+  }
+
+  // فقط برای استفاده محلی Flutter
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -47,14 +64,20 @@ class CustomerModel {
   }
 
   factory CustomerModel.fromMap(Map<String, dynamic> map) {
+    final entityStateIndex = map['entityState'] as int?;
+
     return CustomerModel(
       id: map['id'] as int?,
-      fullName: map['fullName'] ?? '',
-      phone: map['phone'] ?? '',
-      address: map['address'] ?? '',
-      isActive: map['isActive'] ?? true,
+      fullName: map['fullName'] as String? ?? '',
+      phone: map['phone'] as String? ?? '',
+      address: map['address'] as String? ?? '',
+      isActive: map['isActive'] as bool? ?? true,
       entityState:
-          EntityState.values[map['entityState'] ?? EntityState.unchanged.index],
+          entityStateIndex != null &&
+              entityStateIndex >= 0 &&
+              entityStateIndex < EntityState.values.length
+          ? EntityState.values[entityStateIndex]
+          : EntityState.unchanged,
     );
   }
 }
