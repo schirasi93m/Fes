@@ -1,5 +1,5 @@
-import '../../../core/enums/entity_state.dart';
 import '../models/customer_model.dart';
+import '../../../core/enums/entity_state.dart';
 import 'customer_repository.dart';
 
 class InMemoryCustomerRepository implements CustomerRepository {

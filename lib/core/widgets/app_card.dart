@@ -43,7 +43,7 @@ class AppCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  if (icon != null) icon!,
+                  ?icon,
                   const Spacer(),
                   Text(title, style: AppTextStyles.titleMedium),
                 ],

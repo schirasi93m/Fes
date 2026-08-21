@@ -73,7 +73,8 @@ class _CustomersPageState extends State<CustomersPage> {
     }
 
     final results = _allCustomers.where((customer) {
-      return customer.fullName.contains(query) ||
+      return customer.code.toString().contains(query) ||
+          customer.fullName.contains(query) ||
           customer.phone.contains(query) ||
           customer.address.contains(query);
     }).toList();
@@ -84,6 +85,7 @@ class _CustomersPageState extends State<CustomersPage> {
   List<List<Widget>> _buildRows() {
     return _filteredCustomers.map((customer) {
       return [
+        Text(customer.code.toString()),
         Text(customer.fullName),
         Text(customer.phone),
         Text(customer.address),
@@ -204,24 +206,28 @@ class _CustomersPageState extends State<CustomersPage> {
 
                     columns: const [
                       AppTableColumn(
+                        title: "کد",
+                        width: AppTableSizes.code,
+                      ),
+                      AppTableColumn(
                         title: "نام مشتری",
-                        width: AppTableSizes.customerName,
+                        width: AppTableSizes.name
                       ),
                       AppTableColumn(
                         title: "شماره تماس",
-                        width: AppTableSizes.customerPhone,
+                        width: AppTableSizes.number,
                       ),
                       AppTableColumn(
                         title: "آدرس",
-                        width: AppTableSizes.customerAddress,
+                        width: AppTableSizes.address,
                       ),
                       AppTableColumn(
                         title: "وضعیت",
-                        width: AppTableSizes.customerStatus,
+                        width: AppTableSizes.status,
                       ),
                       AppTableColumn(
                         title: "عملیات",
-                        width: AppTableSizes.customerActions,
+                        width: AppTableSizes.actions,
                       ),
                     ],
 

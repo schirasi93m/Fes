@@ -36,4 +36,6 @@ class AppRadius {
   static const double dropDown = 12;
   // Notifer
   static const double notifer = 16;
+  // Staus Toggle
+   static const double stausToggle = 12.0;
 }

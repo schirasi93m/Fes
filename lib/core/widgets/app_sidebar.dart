@@ -80,7 +80,7 @@ class AppSidebar extends StatelessWidget {
 
                   _buildItem(
                     index: 2,
-                    title: "شرکت‌ها",
+                    title: "کپسول ها",
                     icon: AppIcons.company,
                   ),
 

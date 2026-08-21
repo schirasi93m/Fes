@@ -16,11 +16,13 @@ class CustomerService {
   }
 
   CustomerModel createCustomer({
+    required int code,
     required String fullName,
     required String phone,
     required String address,
   }) {
     final customer = CustomerModel(
+      code: code,
       fullName: fullName.trim(),
       phone: phone.trim(),
       address: address.trim(),

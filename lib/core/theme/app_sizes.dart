@@ -23,6 +23,7 @@ class AppSizes {
   static const double buttonIconSm = 18;
   static const double buttonIconMd = 20;
   static const double buttonIconLg = 22;
+  static const double iconSize = 32.0;
 
   // Font Sizes
   static const double buttonFontSm = 13;
@@ -65,8 +66,12 @@ class AppSizes {
   static const double progressIndicatorMd = 20;
   static const double progressIndicatorLg = 24;
 
+  // StatusToggleSizes
+  static const double indicatorSize = 10.0;
+
   // Footer
   static const double footerHeight = 28;
+
   // UserSideBar
   static const double avatarRadius = 20;
 
@@ -78,10 +83,15 @@ class AppSizes {
 
 class AppTableSizes {
   AppTableSizes._();
+  static const double actions = 120;
+  static const double status = 120;
+  static const double code = 100;
+  static const double address = 250;
+  static const double name = 150;
+  static const double number = 100;
+  static const double date = 150;
 
-  static const double customerName = 220;
-  static const double customerPhone = 180;
-  static const double customerAddress = 320;
-  static const double customerStatus = 150;
-  static const double customerActions = 120;
+
+
+  // سایز های مربوط به کپسول
 }

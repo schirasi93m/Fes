@@ -1,20 +1,22 @@
 import 'package:new_project_fes/core/enums/entity_state.dart';
+import 'package:new_project_fes/core/models/entity_base.dart';
 
-class CustomerModel {
+class CustomerModel extends EntityBase {
   final int? id;
+  final int code;
   final String fullName;
   final String phone;
   final String address;
   final bool isActive;
-  final EntityState entityState;
 
   const CustomerModel({
     this.id,
+    required this.code,
     required this.fullName,
     required this.phone,
     required this.address,
     this.isActive = true,
-    this.entityState = EntityState.inserted,
+    super.entityState,
   });
 
   CustomerModel copyWith({
@@ -27,6 +29,7 @@ class CustomerModel {
   }) {
     return CustomerModel(
       id: id ?? this.id,
+      code: code,
       fullName: fullName ?? this.fullName,
       phone: phone ?? this.phone,
       address: address ?? this.address,
@@ -35,9 +38,9 @@ class CustomerModel {
     );
   }
 
-  // اطلاعات مورد نیاز API
   Map<String, dynamic> toApiMap() {
     final map = <String, dynamic>{
+      'code': code,
       'fullName': fullName,
       'phone': phone,
       'address': address,
@@ -51,33 +54,18 @@ class CustomerModel {
     return map;
   }
 
-  // فقط برای استفاده محلی Flutter
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'fullName': fullName,
-      'phone': phone,
-      'address': address,
-      'isActive': isActive,
-      'entityState': entityState.index,
-    };
-  }
-
   factory CustomerModel.fromMap(Map<String, dynamic> map) {
-    final entityStateIndex = map['entityState'] as int?;
-
     return CustomerModel(
       id: map['id'] as int?,
+      code: map['code']as int,
       fullName: map['fullName'] as String? ?? '',
       phone: map['phone'] as String? ?? '',
       address: map['address'] as String? ?? '',
       isActive: map['isActive'] as bool? ?? true,
-      entityState:
-          entityStateIndex != null &&
-              entityStateIndex >= 0 &&
-              entityStateIndex < EntityState.values.length
-          ? EntityState.values[entityStateIndex]
-          : EntityState.unchanged,
+
+      // چون API وضعیت EntityState را نمی‌فرستد،
+      // داده دریافتی از سرور را فعلاً Unchanged در نظر می‌گیریم.
+      entityState: EntityState.unchanged,
     );
   }
 }

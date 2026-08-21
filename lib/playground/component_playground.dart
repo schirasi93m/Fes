@@ -258,7 +258,7 @@ class _ComponentShowcaseState extends State<ComponentShowcase> {
             //-------------------------------------
             //     Table
             //---------------------------------------
-            AppSearchBox(controller: searchController!),
+            AppSearchBox(controller: searchController),
             const SizedBox(height: AppSpacing.xxl),
             //-------------------------------------
             //     Table
