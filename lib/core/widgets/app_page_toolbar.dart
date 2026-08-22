@@ -67,73 +67,100 @@ class PageToolbar extends StatelessWidget {
         color: AppColors.background,
         border: Border(bottom: BorderSide(color: AppColors.border)),
       ),
-      child: Row(
-        children: [
-          //==========================
-          // Search
-          //==========================
-          if (showSreachBox)
-            Flexible(
-              child: AppSearchBox(
-                controller: searchController!,
-                hintText: searchHint,
-                onChanged: onSearchChanged,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < 900;
+
+          final search = showSreachBox
+              ? isCompact
+                    ? ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minWidth: 220,
+                          maxWidth: 360,
+                        ),
+                        child: AppSearchBox(
+                          controller: searchController!,
+                          hintText: searchHint,
+                          onChanged: onSearchChanged,
+                        ),
+                      )
+                    : Flexible(
+                        child: AppSearchBox(
+                          controller: searchController!,
+                          hintText: searchHint,
+                          onChanged: onSearchChanged,
+                        ),
+                      )
+              : null;
+
+          final actions = [
+            if (showRefresh)
+              AppButton(
+                icon: AppIcons.refresh,
+                type: AppButtonType.text,
+                onPressed: onRefreshPressed,
               ),
-            ),
-          
+            if (showFilter)
+              AppButton(
+                icon: AppIcons.filter,
+                type: AppButtonType.text,
+                onPressed: onFilterPressed,
+              ),
+            if (showExcel)
+              AppButton(
+                icon: AppIcons.excel,
+                type: AppButtonType.text,
+                onPressed: onExcelPressed,
+              ),
+            if (showPdf)
+              AppButton(
+                icon: AppIcons.pdf,
+                type: AppButtonType.text,
+                onPressed: onPdfPressed,
+              ),
+            if (showPrint)
+              AppButton(
+                icon: AppIcons.print,
+                type: AppButtonType.text,
+                onPressed: onPrintPressed,
+              ),
+          ];
 
-          if (searchController != null) const SizedBox(width: AppSpacing.md),
+          final primaryButton = primaryButtonText == null
+              ? null
+              : AppButton(
+                  text: primaryButtonText!,
+                  icon: primaryButtonIcon ?? AppIcons.add,
+                  onPressed: onPrimaryPressed,
+                );
+          final searchGap = searchController == null
+              ? null
+              : const SizedBox(width: AppSpacing.md);
 
-          //==========================
-          // Action Buttons
-          //==========================
-          if (showRefresh)
-            AppButton(
-              icon: AppIcons.refresh,
-              type: AppButtonType.text,
-              onPressed: onRefreshPressed,
-            ),
+          if (isCompact) {
+            return Wrap(
+              alignment: WrapAlignment.end,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                ?search,
+                ...actions,
+                ?primaryButton,
+              ],
+            );
+          }
 
-          if (showFilter)
-            AppButton(
-              icon: AppIcons.filter,
-              type: AppButtonType.text,
-              onPressed: onFilterPressed,
-            ),
-
-          if (showExcel)
-            AppButton(
-              icon: AppIcons.excel,
-              type: AppButtonType.text,
-              onPressed: onExcelPressed,
-            ),
-
-          if (showPdf)
-            AppButton(
-              icon: AppIcons.pdf,
-              type: AppButtonType.text,
-              onPressed: onPdfPressed,
-            ),
-
-          if (showPrint)
-            AppButton(
-              icon: AppIcons.print,
-              type: AppButtonType.text,
-              onPressed: onPrintPressed,
-            ),
-
-          const Spacer(),
-
-          //==========================
-          // Primary Button
-          //==========================
-          if (primaryButtonText != null)
-            AppButton(
-              text: primaryButtonText!,
-              icon: primaryButtonIcon ?? AppIcons.add,
-              onPressed: onPrimaryPressed,
-            ),
-        ],
+          return Row(
+            children: [
+              ?search,
+              ?searchGap,
+              ...actions,
+              const Spacer(),
+              ?primaryButton,
+            ],
+          );
+        },
       ),
     );
   }

@@ -4,24 +4,23 @@ import 'package:persian_datetime_picker/persian_datetime_picker.dart' as shamsi;
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_sizes.dart';
-import '../theme/app_spacing.dart';
+import 'app_field_base.dart';
 
-class MyPersianCalendar extends StatelessWidget {
-  final String label;
+class MyPersianCalendar extends AppFieldBase {
   final DateTime? value;
   final ValueChanged<DateTime?> onChanged;
   final DateTime? firstDate;
   final DateTime? lastDate;
-  final bool enabled;
 
   const MyPersianCalendar({
     super.key,
-    required this.label,
+    required super.label,
+    super.requiredField,
     required this.value,
     required this.onChanged,
     this.firstDate,
     this.lastDate,
-    this.enabled = true,
+    super.enabled,
   });
 
   static const int defaultFirstYear = 1400;
@@ -87,46 +86,18 @@ class MyPersianCalendar extends StatelessWidget {
     return shamsi.Jalali.fromDateTime(value!).formatCompactDate();
   }
 
-  OutlineInputBorder _border({required Color color, double width = 1}) {
-    return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppRadius.textField),
-      borderSide: BorderSide(color: color, width: width),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: enabled ? () => _openPicker(context) : null,
       borderRadius: BorderRadius.circular(AppRadius.textField),
       child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          enabled: enabled,
-
-          prefixIcon: null,
-
+        decoration: fieldDecoration(
           suffixIcon: Icon(
             Icons.edit_calendar_outlined,
             size: AppSizes.iconMd,
             color: enabled ? AppColors.textSecondary : AppColors.textDisabled,
           ),
-
-          filled: true,
-          fillColor: AppColors.surface,
-
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.md,
-          ),
-
-          border: _border(color: AppColors.border),
-
-          enabledBorder: _border(color: AppColors.border),
-
-          focusedBorder: _border(color: AppColors.primary, width: 1.5),
-
-          disabledBorder: _border(color: AppColors.border),
         ),
         child: Text(
           _displayDate(),

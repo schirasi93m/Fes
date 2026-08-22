@@ -17,23 +17,30 @@ import 'package:new_project_fes/features/code_title/models/code_title_model.dart
 import 'package:new_project_fes/features/code_title/repository/code_title_repository_api.dart';
 import 'package:new_project_fes/features/customers/models/customer_model.dart';
 import 'package:new_project_fes/features/customers/repository/customer_repository_api.dart';
+import 'package:new_project_fes/features/customers/widgets/customer_form_dialog.dart';
 import 'package:new_project_fes/features/extinguishers/controllers/extinguisher_controller.dart';
 import 'package:new_project_fes/features/extinguishers/models/extinguishers_model.dart';
 
 class ExtinguisherDialog extends StatefulWidget {
   final ExtinguisherModel? extinguisher;
   final ExtinguisherController controller;
+  final VoidCallback? onCustomersPressed;
+  final ValueChanged<CustomerModel>? onCustomerEdit;
 
   const ExtinguisherDialog({
     super.key,
     required this.controller,
     this.extinguisher,
+    this.onCustomersPressed,
+    this.onCustomerEdit,
   });
 
   static Future<ExtinguisherModel?> show(
     BuildContext context, {
     required ExtinguisherController controller,
     ExtinguisherModel? extinguisher,
+    VoidCallback? onCustomersPressed,
+    ValueChanged<CustomerModel>? onCustomerEdit,
   }) {
     return showDialog<ExtinguisherModel>(
       context: context,
@@ -41,6 +48,8 @@ class ExtinguisherDialog extends StatefulWidget {
       builder: (_) => ExtinguisherDialog(
         controller: controller,
         extinguisher: extinguisher,
+        onCustomersPressed: onCustomersPressed,
+        onCustomerEdit: onCustomerEdit,
       ),
     );
   }
@@ -244,11 +253,6 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
       return;
     }
 
-    if (location.isEmpty) {
-      AppNotifier.warning(context, 'محل استقرار را وارد کنید.');
-      return;
-    }
-
     if (customerId == null) {
       AppNotifier.warning(context, 'مشتری را انتخاب کنید.');
       return;
@@ -336,12 +340,22 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
     return AppSelector<CustomerModel>(
       label: 'مشتری',
       hint: 'مشتری را انتخاب کنید',
+      requiredField: true,
       value: _customers.cast<CustomerModel?>().firstWhere(
         (customer) => customer?.id == selectedCustomerId,
         orElse: () => null,
       ),
       items: _customers,
       itemLabel: (customer) => customer.fullName,
+      secondaryItemLabel: (customer) => customer.code.toString(),
+      primaryHeader: 'عنوان',
+      secondaryHeader: 'کد',
+      searchable: true,
+      searchHint: 'جستجوی مشتری...',
+      showAddButton: true,
+      showEditButton: true,
+      onAddPressed: widget.onCustomersPressed == null ? null : _openCustomers,
+      onEditPressed: widget.onCustomerEdit == null ? null : _openCustomerEdit,
       enabled: !_isSubmitting,
       onChanged: (customer) {
         setState(() {
@@ -349,6 +363,51 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
         });
       },
     );
+  }
+
+  void _openCustomers() {
+    if (_isSubmitting) {
+      return;
+    }
+
+    Navigator.of(context).pop();
+    widget.onCustomersPressed?.call();
+  }
+
+  Future<void> _openCustomerEdit() async {
+    if (_isSubmitting || selectedCustomerId == null) {
+      return;
+    }
+
+    final customer = _customers.cast<CustomerModel?>().firstWhere(
+      (item) => item?.id == selectedCustomerId,
+      orElse: () => null,
+    );
+
+    if (customer == null) {
+      return;
+    }
+
+    final updatedCustomer = await CustomerDialog.show(
+      context,
+      customer: customer,
+    );
+
+    if (updatedCustomer == null || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _customers = _customers.map((item) {
+        if (item.id == updatedCustomer.id) {
+          return updatedCustomer;
+        }
+        return item;
+      }).toList();
+      selectedCustomerId = updatedCustomer.id;
+    });
+
+    AppNotifier.success(context, 'اطلاعات مشتری با موفقیت ویرایش شد.');
   }
 
   Widget _buildTypeField() {
@@ -361,13 +420,21 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
 
     return AppSelector<CodeTitleModel>(
       label: 'نوع کپسول',
+      secondaryItemLabel: (type) => type.code.toString(),
       hint: 'نوع کپسول را انتخاب کنید',
+      requiredField: true,
       value: _types.cast<CodeTitleModel?>().firstWhere(
         (type) => type?.id == selectedTypeId,
         orElse: () => null,
       ),
       items: _types,
       itemLabel: (type) => type.title,
+      primaryHeader: 'عنوان',
+      secondaryHeader: 'کد',
+      searchable: true,
+      searchHint: 'جستجوی نوع کپسول...',
+      showAddButton: false,
+      showEditButton: false,
       enabled: !_isSubmitting,
       onChanged: (type) {
         setState(() {
@@ -403,12 +470,14 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
                 // ردیف دوم
                 _formRow(
                   first: AppTextField(
+                    requiredField: true,
                     controller: serialNumberController,
                     label: 'شماره سریال',
                     enabled: !_isSubmitting,
                   ),
 
                   second: AppNumberField(
+                    requiredField: true,
                     controller: capacityController,
                     label: 'ظرفیت',
                     min: 0,
@@ -422,6 +491,7 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
                 _formRow(
                   first: MyPersianCalendar(
                     label: 'تاریخ تولید',
+                    requiredField: true,
                     value: productionDate,
                     onChanged: (date) {
                       setState(() {
@@ -432,6 +502,7 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
 
                   second: MyPersianCalendar(
                     label: 'تاریخ سرویس بعدی',
+                    requiredField: true,
                     value: nextServiceDate,
                     onChanged: (date) {
                       setState(() {
@@ -445,6 +516,7 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
 
                 // ردیف چهارم
                 AppTextField(
+                  requiredField: false,
                   controller: locationController,
                   label: 'محل استقرار',
                   enabled: !_isSubmitting,
@@ -456,6 +528,7 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
                 _formRow(
                   first: MyPersianCalendar(
                     label: 'تاریخ آخرین سرویس',
+                    requiredField: true,
                     value: lastServiceDate,
                     onChanged: (date) {
                       setState(() {

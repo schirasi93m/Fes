@@ -32,7 +32,7 @@ class AppColors {
   // Layout
   // ======================
 
-  static const Color headerBackground = Color(0xFF1F2937);
+  static const Color headerBackground = Color(0xFF2A2F3A);
 
   static const Color sidebarBackground = Color(0xFF1F2937);
 
@@ -103,11 +103,11 @@ class AppColors {
   // Table
   //==========================
 
-  static const Color tableHeader = Color(0xFFF8F8F8);
+  static const Color tableHeader = Color(0xFFF3F4F6);
   static const Color tableRow = Colors.white;
   static const Color tableRowHover = Color(0xFFF5F5F5);
   static const Color tableRowSelected = Color(0xFFFFF3E0);
-  static const Color tableAlternateRow = Color(0xffF8F9FB);
+  static const Color tableAlternateRow = Color(0xFFF8FAFC);
   //==========================
   // Dialog
   //==========================

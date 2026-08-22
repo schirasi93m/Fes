@@ -14,7 +14,14 @@ import '../../../core/network/api_client.dart';
 import '../repository/customer_repository_api.dart';
 
 class CustomersPage extends StatefulWidget {
-  const CustomersPage({super.key});
+  final CustomerModel? customerToEdit;
+  final VoidCallback? onCustomerEditHandled;
+
+  const CustomersPage({
+    super.key,
+    this.customerToEdit,
+    this.onCustomerEditHandled,
+  });
 
   @override
   State<CustomersPage> createState() => _CustomersPageState();
@@ -31,6 +38,7 @@ class _CustomersPageState extends State<CustomersPage> {
   List<CustomerModel> _filteredCustomers = [];
 
   bool _isLoading = true;
+  bool _didOpenRequestedCustomer = false;
 
   @override
   void initState() {
@@ -55,12 +63,46 @@ class _CustomersPageState extends State<CustomersPage> {
         _isLoading = false;
       });
 
+      _openRequestedCustomer(customers);
+
       _applyFilter(searchController.text);
     } catch (e) {
       setState(() => _isLoading = false);
 
       if (!mounted) return;
       AppNotifier.error(context, "دریافت لیست مشتریان با خطا مواجه شد.");
+    }
+  }
+
+  Future<void> _openRequestedCustomer(List<CustomerModel> customers) async {
+    final requestedCustomer = widget.customerToEdit;
+    if (_didOpenRequestedCustomer || requestedCustomer == null) return;
+
+    final customer = customers.cast<CustomerModel?>().firstWhere(
+      (item) => item?.id == requestedCustomer.id,
+      orElse: () => null,
+    );
+    if (customer == null) return;
+
+    _didOpenRequestedCustomer = true;
+    widget.onCustomerEditHandled?.call();
+    await Future<void>.delayed(Duration.zero);
+    if (!mounted) return;
+
+    final updatedCustomer = await CustomerDialog.show(
+      context,
+      customer: customer,
+    );
+    if (updatedCustomer == null || !mounted) return;
+
+    try {
+      await customerController.update(updatedCustomer);
+      if (!mounted) return;
+      AppNotifier.success(context, "اطلاعات مشتری با موفقیت ویرایش شد.");
+      await _loadCustomers();
+    } catch (e) {
+      if (!mounted) return;
+      AppNotifier.error(context, "ویرایش مشتری با خطا مواجه شد. دوباره تلاش کنید.");
     }
   }
 

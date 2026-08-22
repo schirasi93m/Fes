@@ -84,7 +84,7 @@ class AppSizes {
 class AppTableSizes {
   AppTableSizes._();
   static const double actions = 120;
-  static const double status = 120;
+  static const double status = 150;
   static const double code = 100;
   static const double address = 250;
   static const double name = 150;

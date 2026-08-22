@@ -69,7 +69,7 @@ class AppTable extends StatelessWidget {
 
   Widget _buildHeader() {
     return Container(
-      color: AppColors.tableAlternateRow,
+      color: AppColors.tableHeader,
       child: Row(
         children: columns.map((column) {
           return AppTableCell(

@@ -1,28 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:new_project_fes/core/theme/app_radius.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_icons.dart';
 import '../theme/app_sizes.dart';
 import '../theme/app_spacing.dart';
+import 'app_field_base.dart';
 
-class AppNumberField extends StatelessWidget {
+class AppNumberField extends AppFieldBase {
   final TextEditingController controller;
-  final String label;
   final double min;
   final double? max;
   final double step;
   final int decimalDigits;
   final ValueChanged<double>? onChanged;
+  final ValueChanged<String>? onTextChanged;
 
   const AppNumberField({
     super.key,
     required this.controller,
-    required this.label,
+    super.label,
+    super.requiredField,
+    super.hint,
+    super.prefixIcon,
+    super.suffixIcon,
     this.min = 0,
     this.max,
     this.step = 1,
     this.decimalDigits = 0,
+    super.readOnly,
+    super.enabled,
+    super.autofocus,
+    super.focusNode,
     this.onChanged,
+    this.onTextChanged,
+    super.onTap,
+    super.validator,
+    super.inputFormatters,
   });
 
   double _currentValue() {
@@ -48,57 +61,64 @@ class AppNumberField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    final hasText = controller.text.isNotEmpty;
+
+    return TextFormField(
       controller: controller,
+      readOnly: readOnly,
+      enabled: enabled,
+      autofocus: autofocus,
+      focusNode: focusNode,
+      onChanged: (value) {
+        onTextChanged?.call(value);
+      },
+      onTap: onTap,
+      validator: validator,
+      inputFormatters: inputFormatters,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      decoration: InputDecoration(
-        labelText: label,
-
-        filled: true,
-        fillColor: AppColors.surface,
-
+      decoration: fieldDecoration(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm,
         ),
-
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.textField),
-          borderSide: BorderSide(color: AppColors.border),
-        ),
-
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.textField),
-          borderSide: BorderSide(color: AppColors.border),
-        ),
-
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.textField),
-          borderSide: BorderSide(color: AppColors.primary),
-        ),
-
-        suffixIcon: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        suffixIcon: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            InkWell(
-              onTap: () {
-                _setValue(_currentValue() + step);
-              },
-              child: SizedBox(
-                width: AppSizes.iconLg,
-                height: AppSizes.iconLg,
-                child: const Icon(Icons.keyboard_arrow_up_rounded),
+            if (hasText && enabled && !readOnly)
+              IconButton(
+                onPressed: () {
+                  controller.clear();
+                  onTextChanged?.call('');
+                },
+                splashRadius: 18,
+                tooltip: 'پاک کردن مقدار',
+                icon: Icon(AppIcons.close, color: AppColors.textSecondary),
               ),
-            ),
-            InkWell(
-              onTap: () {
-                _setValue(_currentValue() - step);
-              },
-              child: SizedBox(
-                width: AppSizes.iconLg,
-                height: AppSizes.iconLg,
-                child: const Icon(Icons.keyboard_arrow_down_rounded),
-              ),
+            suffixIcon ?? const SizedBox.shrink(),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: enabled && !readOnly
+                      ? () => _setValue(_currentValue() + step)
+                      : null,
+                  child: SizedBox(
+                    width: AppSizes.iconLg,
+                    height: AppSizes.iconLg,
+                    child: const Icon(Icons.keyboard_arrow_up_rounded),
+                  ),
+                ),
+                InkWell(
+                  onTap: enabled && !readOnly
+                      ? () => _setValue(_currentValue() - step)
+                      : null,
+                  child: SizedBox(
+                    width: AppSizes.iconLg,
+                    height: AppSizes.iconLg,
+                    child: const Icon(Icons.keyboard_arrow_down_rounded),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

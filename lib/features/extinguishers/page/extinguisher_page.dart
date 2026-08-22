@@ -25,7 +25,14 @@ import '../models/extinguishers_model.dart';
 import '../widget/extinguisher_form_dialog.dart';
 
 class ExtinguisherPage extends StatefulWidget {
-  const ExtinguisherPage({super.key});
+  final VoidCallback? onCustomersPressed;
+  final ValueChanged<CustomerModel>? onCustomerEdit;
+
+  const ExtinguisherPage({
+    super.key,
+    this.onCustomersPressed,
+    this.onCustomerEdit,
+  });
 
   @override
   State<ExtinguisherPage> createState() => _ExtinguisherPageState();
@@ -50,23 +57,30 @@ class _ExtinguisherPageState extends State<ExtinguisherPage> {
   bool _isLoading = true;
 
   List<ExtinguisherModel> get _filteredExtinguishers {
-    final query = searchController.text.trim().toLowerCase();
+    final query = _normalizeSearchText(searchController.text);
 
     if (query.isEmpty) {
       return _extinguishers;
     }
 
     return _extinguishers.where((extinguisher) {
-      final customerName = _getCustomerName(
-        extinguisher.customerId,
-      ).toLowerCase();
-      final typeTitle = _getTitleByTypeId(extinguisher.typeId).toLowerCase();
-      return extinguisher.serialNumber.toLowerCase().contains(query) ||
-          (extinguisher.location?.toLowerCase().contains(query) ?? false) ||
+      final customer = _getCustomer(extinguisher.customerId);
+      final codeTitle = _getCodeTitle(extinguisher.typeId);
+
+      return _normalizeSearchText(extinguisher.serialNumber).contains(query) ||
+          _normalizeSearchText(extinguisher.location ?? '').contains(query) ||
           extinguisher.typeId.toString().contains(query) ||
           extinguisher.customerId.toString().contains(query) ||
-          customerName.contains(query) ||
-          typeTitle.contains(query);
+          (customer != null &&
+              (_normalizeSearchText(customer.fullName).contains(query) ||
+                  customer.code.toString().contains(query) ||
+                  _normalizeSearchText(customer.phone).contains(query) ||
+                  _normalizeSearchText(customer.address).contains(query))) ||
+          (codeTitle != null &&
+              (_normalizeSearchText(codeTitle.title).contains(query) ||
+                  _normalizeSearchText(codeTitle.latinTitle).contains(query) ||
+                  codeTitle.id.toString().contains(query) ||
+                  codeTitle.code.toString().contains(query)));
     }).toList();
   }
 
@@ -123,29 +137,48 @@ class _ExtinguisherPageState extends State<ExtinguisherPage> {
     }
   }
 
-  String _getCustomerName(int customerId) {
+  CustomerModel? _getCustomer(int customerId) {
     for (final customer in _customers) {
       if (customer.id == customerId) {
-        return customer.fullName;
+        return customer;
       }
     }
 
-    return '---';
+    return null;
+  }
+
+  CodeTitleModel? _getCodeTitle(int typeId) {
+    for (final codeTitle in _codeTitleList) {
+      if (codeTitle.id == typeId || codeTitle.code == typeId) {
+        return codeTitle;
+      }
+    }
+    return null;
+  }
+
+  String _getCustomerName(int customerId) {
+    return _getCustomer(customerId)?.fullName ?? '---';
   }
 
   String _getTitleByTypeId(int typeId) {
-    for (final codeTitle in _codeTitleList) {
-      if (codeTitle.id == typeId) {
-        return codeTitle.title;
-      }
-    }
-    return '---';
+    return _getCodeTitle(typeId)?.title ?? '---';
+  }
+
+  String _normalizeSearchText(String value) {
+    return value
+        .trim()
+        .toLowerCase()
+        .replaceAll('ي', 'ی')
+        .replaceAll('ك', 'ک')
+        .replaceAll('ة', 'ه');
   }
 
   Future<void> _addExtinguisher() async {
     final extinguisher = await ExtinguisherDialog.show(
       context,
       controller: _controller,
+      onCustomersPressed: widget.onCustomersPressed,
+      onCustomerEdit: widget.onCustomerEdit,
     );
 
     if (extinguisher == null) {
@@ -169,6 +202,8 @@ class _ExtinguisherPageState extends State<ExtinguisherPage> {
       context,
       controller: _controller,
       extinguisher: extinguisher,
+      onCustomersPressed: widget.onCustomersPressed,
+      onCustomerEdit: widget.onCustomerEdit,
     );
 
     if (updatedExtinguisher == null) {

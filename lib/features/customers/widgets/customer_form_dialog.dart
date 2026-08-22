@@ -117,17 +117,19 @@ class _CustomerDialogState extends State<CustomerDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             AppTextField(
+              requiredField: true,
               controller: codeController,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               label: "کد مشتری",
             ),
             const SizedBox(height: AppSpacing.md),
-            AppTextField(controller: fullNameController, label: "نام کامل"),
+            AppTextField(requiredField: true,controller: fullNameController, label: "نام کامل"),
 
             const SizedBox(height: AppSpacing.md),
 
             AppTextField(
+              requiredField: true,
               controller: phoneController,
               label: "شماره تماس",
               keyboardType: TextInputType.phone,
@@ -137,6 +139,7 @@ class _CustomerDialogState extends State<CustomerDialog> {
             const SizedBox(height: AppSpacing.md),
 
             AppTextField(
+              requiredField: true,
               controller: addressController,
               label: "آدرس",
               maxLines: 3,
