@@ -16,6 +16,7 @@ import 'package:new_project_fes/core/widgets/status_toggle.dart';
 import 'package:new_project_fes/features/code_title/models/code_title_model.dart';
 import 'package:new_project_fes/features/code_title/repository/code_title_repository_api.dart';
 import 'package:new_project_fes/features/customers/models/customer_model.dart';
+import 'package:new_project_fes/features/customers/controllers/customer_controller.dart';
 import 'package:new_project_fes/features/customers/repository/customer_repository_api.dart';
 import 'package:new_project_fes/features/customers/widgets/customer_form_dialog.dart';
 import 'package:new_project_fes/features/extinguishers/controllers/extinguisher_controller.dart';
@@ -68,6 +69,9 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
 
   final CustomerRepositoryApi _customerRepository = CustomerRepositoryApi(
     ApiClient(),
+  );
+  late final CustomerController _customerController = CustomerController(
+    _customerRepository,
   );
 
   final CodeTitleRepositoryApi _codeTitleRepository = CodeTitleRepositoryApi(
@@ -286,6 +290,7 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
       lastServiceDate: lastServiceDate!,
       nextServiceDate: nextServiceDate!,
       isActive: isActive,
+      rowVersion: oldExtinguisher?.rowVersion,
       entityState: isEditMode ? EntityState.modified : EntityState.inserted,
     );
 
@@ -397,17 +402,31 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
       return;
     }
 
-    setState(() {
-      _customers = _customers.map((item) {
-        if (item.id == updatedCustomer.id) {
-          return updatedCustomer;
-        }
-        return item;
-      }).toList();
-      selectedCustomerId = updatedCustomer.id;
-    });
+    try {
+      final savedCustomer = await _customerController.update(updatedCustomer);
 
-    AppNotifier.success(context, 'اطلاعات مشتری با موفقیت ویرایش شد.');
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _customers = _customers.map((item) {
+          if (item.id == savedCustomer.id) {
+            return savedCustomer;
+          }
+          return item;
+        }).toList();
+        selectedCustomerId = savedCustomer.id;
+      });
+
+      AppNotifier.success(context, 'اطلاعات مشتری با موفقیت ویرایش شد.');
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      AppNotifier.error(context, 'ویرایش مشتری با خطا مواجه شد.');
+    }
   }
 
   Widget _buildTypeField() {
@@ -454,7 +473,7 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
         title: Text(isEditMode ? 'ویرایش کپسول' : 'کپسول جدید'),
 
         content: SizedBox(
-          width: AppSizes.dialogWidth,
+          width: AppSizes.responsiveDialogWidth(context),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
+import '../theme/app_sizes.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_style.dart';
 
@@ -34,7 +35,7 @@ class AppDialog {
           backgroundColor: AppColors.surface,
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: width,
+              maxWidth: width > 0 ? width : AppSizes.responsiveDialogWidth(context),
               maxHeight: height ?? 600,
             ),
             child: Padding(

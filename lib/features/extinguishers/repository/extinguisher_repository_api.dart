@@ -1,3 +1,4 @@
+import '../../../core/enums/entity_state.dart';
 import '../../../core/network/api_client.dart';
 import '../models/extinguishers_model.dart';
 import 'extinguisher_repository.dart';
@@ -54,13 +55,17 @@ class ExtinguisherRepositoryApi implements ExtinguisherRepository {
       data: extinguisher.toApiMap(),
     );
 
+    if (response.statusCode == 204 || response.data == null) {
+      return extinguisher.copyWith(entityState: EntityState.modified);
+    }
+
     if (response.data is! Map) {
       throw Exception('فرمت پاسخ ویرایش کپسول نامعتبر است.');
     }
 
     return ExtinguisherModel.fromMap(
       Map<String, dynamic>.from(response.data as Map),
-    );
+    ).copyWith(entityState: EntityState.modified);
   }
 
   @override

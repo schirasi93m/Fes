@@ -58,9 +58,8 @@ class AppSidebarUser extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(width: AppSpacing.md),
+            const SizedBox(width: AppSpacing.sm),
             if (expanded) ...[
-              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

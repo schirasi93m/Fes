@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class AppSizes {
   AppSizes._();
 
@@ -32,7 +34,22 @@ class AppSizes {
 
   // Widths
   static const double drawerWidth = 280;
-  static const double dialogWidth = 500;
+  static const double dialogWidth = 900;
+
+  static double responsiveDialogWidth(
+    BuildContext context, {
+    double maxWidth = dialogWidth,
+    double minWidth = 320,
+  }) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final availableWidth = screenWidth - 32;
+
+    if (availableWidth <= 0) {
+      return maxWidth;
+    }
+
+    return availableWidth.clamp(minWidth, maxWidth);
+  }
 
   // Icon Sizes
   static const double iconSm = 16;
@@ -90,6 +107,7 @@ class AppTableSizes {
   static const double name = 150;
   static const double number = 100;
   static const double date = 150;
+  static const double test = 120;
 
 
 

@@ -7,12 +7,14 @@ import 'app_table_cell.dart';
 class AppTableRow extends StatefulWidget {
   final List<Widget> row;
   final List<AppTableColumn> columns;
+  final List<double> resolvedWidths;
   final bool isEven;
 
   const AppTableRow({
     super.key,
     required this.row,
     required this.columns,
+    required this.resolvedWidths,
     required this.isEven,
   });
 
@@ -43,7 +45,7 @@ class _AppTableRowState extends State<AppTableRow> {
         child: Row(
           children: List.generate(widget.columns.length, (index) {
             return AppTableCell(
-              width: widget.columns[index].width,
+              width: widget.resolvedWidths[index],
               child: widget.row[index],
             );
           }),

@@ -73,6 +73,7 @@ class ExtinguisherModel extends EntityBase {
       'lastServiceDate': lastServiceDate?.toIso8601String(),
       'nextServiceDate': nextServiceDate?.toIso8601String(),
       'isActive': isActive,
+      'entityState': entityState.index,
     };
 
     if (id != null) {

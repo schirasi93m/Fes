@@ -90,7 +90,7 @@ class AppSidebar extends StatelessWidget {
                     icon: AppIcons.service,
                   ),
 
-                  _buildItem(index: 4, title: "گزارشات", icon: AppIcons.report),
+                  /*  _buildItem(index: 4, title: "گزارشات", icon: AppIcons.report),
 
                   _buildItem(
                     index: 5,
@@ -102,7 +102,8 @@ class AppSidebar extends StatelessWidget {
                     title: "کامپونت هاش",
                     icon: AppIcons.playground,
                   ),
-
+*/
+                  const SizedBox(height: AppSpacing.lg),
                   AppSidebarUser(
                     expanded: expanded,
                     fullName: "مصطفی شیرازی",
@@ -166,7 +167,7 @@ class AppSidebar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              const SizedBox(width: AppSpacing.md),
+              const SizedBox(width: AppSpacing.sm),
 
               Icon(
                 icon,
@@ -179,7 +180,7 @@ class AppSidebar extends StatelessWidget {
               ),
 
               if (expanded) ...[
-                const SizedBox(width: AppSpacing.md),
+                const SizedBox(width: AppSpacing.sm),
 
                 Expanded(
                   child: Text(

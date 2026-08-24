@@ -7,6 +7,7 @@ import '../theme/app_sizes.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_style.dart';
 import 'app_button.dart';
+import 'api_status_indicator.dart';
 
 class AppHeader extends StatelessWidget {
   final String title;
@@ -42,6 +43,10 @@ class AppHeader extends StatelessWidget {
           Text(title, style: AppTextStyles.sidebarTitle),
 
           const Spacer(),
+
+          const ApiStatusIndicator(),
+
+          const SizedBox(width: AppSpacing.md),
 
           //------------------------
           // Notification

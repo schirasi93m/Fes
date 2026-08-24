@@ -112,7 +112,7 @@ class _CustomerDialogState extends State<CustomerDialog> {
       title: Text(isEditMode ? "ویرایش مشتری" : "مشتری جدید"),
 
       content: SizedBox(
-        width: AppSizes.dialogWidth,
+        width: AppSizes.responsiveDialogWidth(context),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

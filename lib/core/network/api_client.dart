@@ -19,4 +19,24 @@ class ApiClient {
   }
 
   Dio get dio => _dio;
+
+  Future<ApiConnectionState> checkConnection() async {
+    try {
+      await _dio.get('/');
+      return ApiConnectionState.connected;
+    } on DioException catch (error) {
+      if (error.response != null) {
+        return error.response!.statusCode != null &&
+                error.response!.statusCode! >= 500
+            ? ApiConnectionState.serverError
+            : ApiConnectionState.connected;
+      }
+
+      return ApiConnectionState.disconnected;
+    } catch (_) {
+      return ApiConnectionState.disconnected;
+    }
+  }
 }
+
+enum ApiConnectionState { checking, connected, serverError, disconnected }

@@ -8,6 +8,7 @@ import 'package:new_project_fes/core/widgets/app_sidebar.dart';
 import 'package:new_project_fes/features/customers/pages/customers_page.dart';
 import 'package:new_project_fes/features/customers/models/customer_model.dart';
 import 'package:new_project_fes/features/extinguishers/page/extinguisher_page.dart';
+import 'package:new_project_fes/features/services/pages/services_page.dart';
 import 'package:new_project_fes/playground/component_playground.dart';
 
 class MainScreen extends StatefulWidget {
@@ -89,7 +90,7 @@ class _MainScreenState extends State<MainScreen> {
         );
 
       case 3:
-        return const Center(child: Text("سرویس‌ها"));
+        return const ServicesPage();
 
       case 4:
         return const Center(child: Text("گزارشات"));

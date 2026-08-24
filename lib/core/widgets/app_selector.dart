@@ -154,72 +154,78 @@ class _AppSelectorState<T> extends State<AppSelector<T>> {
               }
               return KeyEventResult.ignored;
             },
-            child: MenuItemButton(
-              style: ButtonStyle(
-                padding: const WidgetStatePropertyAll(
-                  EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                ),
-                minimumSize: const WidgetStatePropertyAll(Size.fromHeight(44)),
-                shape: WidgetStatePropertyAll(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.button),
+            child: GestureDetector(
+              onDoubleTap: () {
+                widget.onChanged(item);
+                menuController?.close();
+              },
+              child: MenuItemButton(
+                style: ButtonStyle(
+                  padding: const WidgetStatePropertyAll(
+                    EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  ),
+                  minimumSize: const WidgetStatePropertyAll(
+                    Size.fromHeight(44),
+                  ),
+                  shape: WidgetStatePropertyAll(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.button),
+                    ),
+                  ),
+                  backgroundColor: WidgetStateProperty.resolveWith(
+                    (states) =>
+                        states.contains(WidgetState.hovered) || isSelected
+                        ? AppColors.tableRowSelected
+                        : Colors.transparent,
                   ),
                 ),
-                backgroundColor: WidgetStateProperty.resolveWith(
-                  (states) => states.contains(WidgetState.hovered) || isSelected
-                      ? AppColors.tableRowSelected
-                      : Colors.transparent,
-                ),
-              ),
-              onPressed: () {
-                widget.onChanged(item);
-                if (activatedByKeyboard) {
-                  menuController?.close();
-                  activatedByKeyboard = false;
-                }
-              },
-              closeOnActivate: false,
-              trailingIcon: isSelected
-                  ? Icon(Icons.check_rounded, color: AppColors.primary)
-                  : null,
-              child: widget.secondaryItemLabel == null
-                  ? Text(
-                      widget.itemLabel(item),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.bodyMedium,
-                    )
-                  : Row(
-                      children: [
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              widget.itemLabel(item),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextStyles.bodyMedium,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 1,
-                          height: 24,
-                          color: AppColors.border.withValues(alpha: 0.8),
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              widget.secondaryItemLabel!(item),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.textSecondary,
+                onPressed: () {
+                  widget.onChanged(item);
+                  if (activatedByKeyboard) {
+                    menuController?.close();
+                    activatedByKeyboard = false;
+                  }
+                },
+                closeOnActivate: false,
+                child: widget.secondaryItemLabel == null
+                    ? Text(
+                        widget.itemLabel(item),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.bodyMedium,
+                      )
+                    : Row(
+                        children: [
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                widget.itemLabel(item),
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.bodyMedium,
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                          Container(
+                            width: 1,
+                            height: 24,
+                            color: AppColors.border.withValues(alpha: 0.8),
+                          ),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                widget.secondaryItemLabel!(item),
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
             ),
           );
         }).toList();
