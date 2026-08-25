@@ -1,9 +1,12 @@
 class ServiceModel {
   int? id;
+
   int customerId;
   int extinguisherId;
+
   DateTime serviceDate;
   DateTime nextServiceDate;
+
   String? description;
 
   bool needsValve;
@@ -27,7 +30,7 @@ class ServiceModel {
   });
 
   Map<String, dynamic> toJson() {
-    return {
+    final data = <String, dynamic>{
       'customerId': customerId,
       'extinguisherId': extinguisherId,
       'serviceDate': serviceDate.toIso8601String(),
@@ -39,6 +42,13 @@ class ServiceModel {
       'needsPowder': needsPowder,
       'needsHose': needsHose,
     };
+
+    // فقط در حالت ویرایش ارسال می‌شود.
+    if (id != null) {
+      data['id'] = id;
+    }
+
+    return data;
   }
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {

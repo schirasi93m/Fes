@@ -12,7 +12,6 @@ import 'package:new_project_fes/core/widgets/app_notifier.dart';
 import 'package:new_project_fes/core/widgets/app_selector.dart';
 import 'package:new_project_fes/core/widgets/app_text_field.dart';
 import 'package:new_project_fes/core/widgets/persian_calendar_picker.dart';
-import 'package:new_project_fes/core/widgets/status_toggle.dart';
 
 import 'package:new_project_fes/features/code_title/models/code_title_model.dart';
 import 'package:new_project_fes/features/code_title/repository/code_title_repository_api.dart';
@@ -30,13 +29,18 @@ import 'package:new_project_fes/features/services/model/service_model.dart';
 import 'package:new_project_fes/features/services/repository/services_api.dart';
 
 class ServiceDialog extends StatefulWidget {
-  const ServiceDialog({super.key});
+  final ServiceModel? service;
 
-  static Future<ServiceModel?> show(BuildContext context) {
+  const ServiceDialog({super.key, this.service});
+
+  static Future<ServiceModel?> show(
+    BuildContext context, {
+    ServiceModel? service,
+  }) {
     return showDialog<ServiceModel>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const ServiceDialog(),
+      builder: (_) => ServiceDialog(service: service),
     );
   }
 
@@ -62,6 +66,8 @@ class _ServiceDialogState extends State<ServiceDialog> {
 
   final ServiceApi _serviceApi = ServiceApi(ApiClient());
 
+  final TextEditingController _descriptionController = TextEditingController();
+
   List<CustomerModel> _customers = [];
   List<ExtinguisherModel> _extinguishers = [];
   List<CodeTitleModel> _extinguisherTypes = [];
@@ -69,12 +75,8 @@ class _ServiceDialogState extends State<ServiceDialog> {
   CustomerModel? _selectedCustomer;
   ExtinguisherModel? _selectedExtinguisher;
 
-  final TextEditingController _descriptionController = TextEditingController();
-
   DateTime? _serviceDate;
   DateTime? _nextServiceDate;
-
-  bool _isActive = true;
 
   bool _needsValve = false;
   bool _needsGauge = false;
@@ -84,6 +86,8 @@ class _ServiceDialogState extends State<ServiceDialog> {
 
   bool _isLoading = true;
   bool _isSubmitting = false;
+
+  bool get isEditMode => widget.service != null;
 
   List<ExtinguisherModel> get _customerExtinguishers {
     final customerId = _selectedCustomer?.id;
@@ -95,6 +99,103 @@ class _ServiceDialogState extends State<ServiceDialog> {
     return _extinguishers
         .where((extinguisher) => extinguisher.customerId == customerId)
         .toList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadData() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
+    try {
+      final results = await Future.wait([
+        _customerRepository.getList(),
+        _extinguisherRepository.getList(),
+        _codeTitleRepository.getByCategoryId(2),
+      ]);
+
+      final customers = results[0] as List<CustomerModel>;
+      final extinguishers = results[1] as List<ExtinguisherModel>;
+      final codeTitles = results[2] as List<CodeTitleModel>;
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _customers = customers;
+        _extinguishers = extinguishers;
+        _extinguisherTypes = codeTitles;
+        _isLoading = false;
+      });
+
+      _initializeEditData();
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      AppNotifier.error(context, 'دریافت اطلاعات سرویس‌ها با خطا مواجه شد.');
+    }
+  }
+
+  void _initializeEditData() {
+    final service = widget.service;
+
+    if (service == null) {
+      return;
+    }
+
+    CustomerModel? customer;
+
+    for (final item in _customers) {
+      if (item.id == service.customerId) {
+        customer = item;
+        break;
+      }
+    }
+
+    ExtinguisherModel? extinguisher;
+
+    for (final item in _extinguishers) {
+      if (item.id == service.extinguisherId) {
+        extinguisher = item;
+        break;
+      }
+    }
+
+    setState(() {
+      _selectedCustomer = customer;
+      _selectedExtinguisher = extinguisher;
+
+      _serviceDate = service.serviceDate;
+      _nextServiceDate = service.nextServiceDate;
+
+      _descriptionController.text = service.description ?? '';
+
+      _needsValve = service.needsValve;
+      _needsGauge = service.needsGauge;
+      _needsPipe = service.needsPipe;
+      _needsPowder = service.needsPowder;
+      _needsHose = service.needsHose;
+    });
   }
 
   String _extinguisherTypeName(ExtinguisherModel extinguisher) {
@@ -124,56 +225,6 @@ class _ServiceDialogState extends State<ServiceDialog> {
         .length;
 
     return '${customer.code} | تعداد: $extinguisherCount';
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  @override
-  void dispose() {
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadData() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final results = await Future.wait([
-        _customerRepository.getList(),
-        _extinguisherRepository.getList(),
-        _codeTitleRepository.getByCategoryId(2),
-      ]);
-
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _customers = results[0] as List<CustomerModel>;
-
-        _extinguishers = results[1] as List<ExtinguisherModel>;
-
-        _extinguisherTypes = results[2] as List<CodeTitleModel>;
-
-        _isLoading = false;
-      });
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      AppNotifier.error(context, 'دریافت اطلاعات سرویس‌ها با خطا مواجه شد.');
-    }
   }
 
   Future<void> _addCustomer() async {
@@ -357,7 +408,10 @@ class _ServiceDialogState extends State<ServiceDialog> {
     });
 
     try {
+      final oldService = widget.service;
+
       final service = ServiceModel(
+        id: oldService?.id,
         customerId: _selectedCustomer!.id!,
         extinguisherId: _selectedExtinguisher!.id!,
         serviceDate: _serviceDate!,
@@ -372,7 +426,13 @@ class _ServiceDialogState extends State<ServiceDialog> {
         needsHose: _needsHose,
       );
 
-      final savedService = await _serviceApi.createService(service);
+      final ServiceModel savedService;
+
+      if (isEditMode) {
+        savedService = await _serviceApi.updateService(service);
+      } else {
+        savedService = await _serviceApi.createService(service);
+      }
 
       if (!mounted) {
         return;
@@ -390,7 +450,9 @@ class _ServiceDialogState extends State<ServiceDialog> {
 
       AppNotifier.error(
         context,
-        'ثبت سرویس با خطا مواجه شد. دوباره تلاش کنید.',
+        isEditMode
+            ? 'ویرایش سرویس با خطا مواجه شد. دوباره تلاش کنید.'
+            : 'ثبت سرویس با خطا مواجه شد. دوباره تلاش کنید.',
       );
     }
   }
@@ -400,13 +462,16 @@ class _ServiceDialogState extends State<ServiceDialog> {
     return AlertDialog(
       backgroundColor: AppColors.surface,
 
-      title: const Text('سرویس جدید'),
+      title: Text(isEditMode ? 'ویرایش سرویس' : 'سرویس جدید'),
 
       content: SizedBox(
         width: AppSizes.responsiveDialogWidth(context),
 
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const SizedBox(
+                height: 250,
+                child: Center(child: CircularProgressIndicator()),
+              )
             : SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -416,7 +481,9 @@ class _ServiceDialogState extends State<ServiceDialog> {
                         Icon(AppIcons.service, color: AppColors.primary),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          'انتخاب اطلاعات سرویس',
+                          isEditMode
+                              ? 'ویرایش اطلاعات سرویس'
+                              : 'انتخاب اطلاعات سرویس',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ],
@@ -608,18 +675,6 @@ class _ServiceDialogState extends State<ServiceDialog> {
                         ],
                       ),
                     ),
-
-                    const SizedBox(height: AppSpacing.md),
-
-                    StatusToggle(
-                      value: _isActive,
-                      title: 'وضعیت سرویس',
-                      onChanged: (value) {
-                        setState(() {
-                          _isActive = value;
-                        });
-                      },
-                    ),
                   ],
                 ),
               ),
@@ -629,10 +684,17 @@ class _ServiceDialogState extends State<ServiceDialog> {
         AppButton(
           text: 'انصراف',
           type: AppButtonType.filled,
-          onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+          onPressed: _isSubmitting
+              ? null
+              : () {
+                  Navigator.pop(context);
+                },
         ),
 
-        AppButton(text: 'ثبت', onPressed: _isSubmitting ? null : _submit),
+        AppButton(
+          text: isEditMode ? 'ذخیره تغییرات' : 'ثبت',
+          onPressed: _isSubmitting ? null : _submit,
+        ),
       ],
     );
   }

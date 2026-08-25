@@ -22,27 +22,30 @@ class ServiceApi {
     return ServiceModel.fromJson(response.data);
   }
 
-  Future<ServiceModel> createService(ServiceModel service) async {
-    try {
-      final data = service.toJson();
 
-      debugPrint('SERVICE REQUEST: $data');
+Future<ServiceModel> createService(ServiceModel service) async {
+  try {
+    final data = service.toJson();
 
-      final response = await _apiClient.dio.post('/Services', data: data);
+    debugPrint('SERVICE REQUEST: $data');
 
-      debugPrint('SERVICE STATUS: ${response.statusCode}');
-      debugPrint('SERVICE RESPONSE: ${response.data}');
+    final response = await _apiClient.dio.post(
+      '/Services',
+      data: data,
+    );
 
-      return ServiceModel.fromJson(response.data);
-    } on DioException catch (e) {
-      debugPrint('SERVICE ERROR STATUS: ${e.response?.statusCode}');
-      debugPrint('SERVICE ERROR DATA: ${e.response?.data}');
-      debugPrint('SERVICE ERROR MESSAGE: ${e.message}');
+    debugPrint('SERVICE STATUS: ${response.statusCode}');
+    debugPrint('SERVICE RESPONSE: ${response.data}');
 
-      rethrow;
-    }
+    return ServiceModel.fromJson(response.data);
+  } on DioException catch (e) {
+    debugPrint('SERVICE ERROR STATUS: ${e.response?.statusCode}');
+    debugPrint('SERVICE ERROR DATA: ${e.response?.data}');
+    debugPrint('SERVICE ERROR MESSAGE: ${e.message}');
+
+    rethrow;
   }
-
+}
   Future<ServiceModel> updateService(ServiceModel service) async {
     if (service.id == null) {
       throw Exception('Service id is required for update.');

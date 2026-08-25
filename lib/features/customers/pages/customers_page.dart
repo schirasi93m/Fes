@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-
 import 'package:new_project_fes/core/models/app_table_column.dart';
 import 'package:new_project_fes/core/network/api_client.dart';
 import 'package:new_project_fes/core/theme/app_sizes.dart';
+import 'package:new_project_fes/core/widgets/app_delete_dialog.dart';
 import 'package:new_project_fes/core/widgets/app_form_page.dart';
 import 'package:new_project_fes/core/widgets/app_notifier.dart';
 import 'package:new_project_fes/core/widgets/status_badge.dart';
-
-import 'package:new_project_fes/features/customers/widgets/customer_delete_dialog.dart';
 import '../controllers/customer_controller.dart';
 import '../models/customer_model.dart';
 import '../widgets/customer_form_dialog.dart';
@@ -209,12 +207,15 @@ class _CustomersPageState extends AppFormPageState<CustomersPage> {
   Future<void> deleteItem(int index) async {
     final customer = _filteredCustomers[index];
 
-    final confirmed = await CustomerDeleteDialog.show(context);
+    final confirmed = await AppDeleteDialog.show(
+      context,
+      title: 'حذف مشتری',
+      message: 'آیا از حذف این مشتری مطمئن هستید؟',
+    );
 
     if (!confirmed) {
       return;
     }
-
     try {
       await _customerController.remove(customer);
 

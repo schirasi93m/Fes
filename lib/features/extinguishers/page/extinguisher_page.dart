@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import 'package:new_project_fes/core/models/app_table_column.dart';
 import 'package:new_project_fes/core/network/api_client.dart';
 import 'package:new_project_fes/core/theme/app_sizes.dart';
+import 'package:new_project_fes/core/widgets/app_delete_dialog.dart';
 import 'package:new_project_fes/core/widgets/app_form_page.dart';
 import 'package:new_project_fes/core/widgets/app_notifier.dart';
 import 'package:new_project_fes/core/widgets/status_badge.dart';
-
 import 'package:new_project_fes/features/code_title/controllers/code_title_controller.dart';
 import 'package:new_project_fes/features/code_title/models/code_title_model.dart';
 import 'package:new_project_fes/features/code_title/repository/code_title_repository_api.dart';
-
 import 'package:new_project_fes/features/customers/controllers/customer_controller.dart';
 import 'package:new_project_fes/features/customers/models/customer_model.dart';
 import 'package:new_project_fes/features/customers/repository/customer_repository_api.dart';
-
 import 'package:new_project_fes/features/extinguishers/controllers/extinguisher_controller.dart';
 import 'package:new_project_fes/features/extinguishers/repository/extinguisher_repository_api.dart';
-import 'package:new_project_fes/features/extinguishers/widget/extinguisher_delete_dialog.dart';
-
 import '../models/extinguishers_model.dart';
 import '../widget/extinguisher_form_dialog.dart';
 
@@ -65,7 +60,7 @@ class _ExtinguisherPageState extends AppFormPageState<ExtinguisherPage> {
 
   @override
   bool get showFilter => false;
-  
+
   @override
   String get searchHint => 'جستجوی کپسول...';
 
@@ -235,7 +230,11 @@ class _ExtinguisherPageState extends AppFormPageState<ExtinguisherPage> {
 
   @override
   Future<void> deleteItem(int index) async {
-    final confirmed = await ExtinguisherDeleteDialog.show(context);
+    final confirmed = await AppDeleteDialog.show(
+      context,
+      title: 'حذف کپسول',
+      message: 'آیا از حذف این کپسول مطمئن هستید؟',
+    );
 
     if (!confirmed) {
       return;

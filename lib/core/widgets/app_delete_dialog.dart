@@ -1,16 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:new_project_fes/core/theme/app_colors.dart';
-import 'package:new_project_fes/core/theme/app_spacing.dart';
-import 'package:new_project_fes/core/widgets/app_button.dart';
 
-class CustomerDeleteDialog extends StatelessWidget {
-  const CustomerDeleteDialog({super.key});
+import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
+import 'app_button.dart';
 
-  static Future<bool> show(BuildContext context) async {
+class AppDeleteDialog extends StatelessWidget {
+  final String title;
+  final String message;
+  final String deleteText;
+  final String cancelText;
+
+  const AppDeleteDialog({
+    super.key,
+    required this.title,
+    required this.message,
+    this.deleteText = 'حذف',
+    this.cancelText = 'انصراف',
+  });
+
+  static Future<bool> show(
+    BuildContext context, {
+    required String title,
+    required String message,
+    String deleteText = 'حذف',
+    String cancelText = 'انصراف',
+  }) async {
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const CustomerDeleteDialog(),
+      builder: (_) => AppDeleteDialog(
+        title: title,
+        message: message,
+        deleteText: deleteText,
+        cancelText: cancelText,
+      ),
     );
 
     return result ?? false;
@@ -20,16 +43,11 @@ class CustomerDeleteDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.surface,
-
-      title: const Center(child: Text("حذف مشتری")),
-
+      title: Center(child: Text(title)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            "آیا از حذف این مشتری مطمئن هستید؟",
-            textAlign: TextAlign.center,
-          ),
+          Text(message, textAlign: TextAlign.center),
 
           const SizedBox(height: AppSpacing.lg),
 
@@ -38,7 +56,7 @@ class CustomerDeleteDialog extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               AppButton(
-                text: "حذف",
+                text: deleteText,
                 onPressed: () {
                   Navigator.of(context).pop(true);
                 },
@@ -47,7 +65,7 @@ class CustomerDeleteDialog extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
 
               AppButton(
-                text: "انصراف",
+                text: cancelText,
                 type: AppButtonType.filled,
                 onPressed: () {
                   Navigator.of(context).pop(false);
