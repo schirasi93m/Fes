@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+
 import 'package:new_project_fes/core/models/app_table_column.dart';
+import 'package:new_project_fes/core/network/api_client.dart';
 import 'package:new_project_fes/core/theme/app_sizes.dart';
+import 'package:new_project_fes/core/widgets/app_form_page.dart';
 import 'package:new_project_fes/core/widgets/app_notifier.dart';
-import 'package:new_project_fes/core/widgets/app_page_toolbar.dart';
-import 'package:new_project_fes/core/widgets/app_table/app_table.dart';
 import 'package:new_project_fes/core/widgets/status_badge.dart';
+
 import 'package:new_project_fes/features/customers/widgets/customer_delete_dialog.dart';
-import '../../../core/theme/app_colors.dart';
 import '../controllers/customer_controller.dart';
 import '../models/customer_model.dart';
 import '../widgets/customer_form_dialog.dart';
-import '../../../core/network/api_client.dart';
 import '../repository/customer_repository_api.dart';
 
-class CustomersPage extends StatefulWidget {
+class CustomersPage extends AppFormPage {
   final CustomerModel? customerToEdit;
   final VoidCallback? onCustomerEditHandled;
 
@@ -27,113 +27,231 @@ class CustomersPage extends StatefulWidget {
   State<CustomersPage> createState() => _CustomersPageState();
 }
 
-class _CustomersPageState extends State<CustomersPage> {
-  final TextEditingController searchController = TextEditingController();
-  final CustomerController customerController = CustomerController(
+class _CustomersPageState extends AppFormPageState<CustomersPage> {
+  final CustomerController _customerController = CustomerController(
     CustomerRepositoryApi(ApiClient()),
   );
 
-  // Full, unfiltered list as last loaded from the repository.
   List<CustomerModel> _allCustomers = [];
-  List<CustomerModel> _filteredCustomers = [];
 
-  bool _isLoading = true;
   bool _didOpenRequestedCustomer = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCustomers();
-  }
+  // ------------------------------------------------------------
+  // Page Settings
+  // ------------------------------------------------------------
 
   @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
-  }
+  String get pageTitle => 'مشتریان';
 
-  Future<void> _loadCustomers() async {
-    setState(() => _isLoading = true);
+  @override
+  String get searchHint => 'جستجوی مشتری...';
+
+  @override
+  String get primaryButtonText => 'مشتری جدید';
+
+  @override
+  bool get showFilter => false;
+
+  // ------------------------------------------------------------
+  // Columns
+  // ------------------------------------------------------------
+
+  @override
+  List<AppTableColumn> get columns => const [
+    AppTableColumn(title: 'کد', width: AppTableSizes.code),
+    AppTableColumn(title: 'نام مشتری', width: AppTableSizes.name),
+    AppTableColumn(title: 'شماره تماس', width: AppTableSizes.number),
+    AppTableColumn(title: 'آدرس', width: AppTableSizes.address),
+    AppTableColumn(title: 'وضعیت', width: AppTableSizes.status),
+    AppTableColumn(title: 'عملیات', width: AppTableSizes.actions),
+  ];
+
+  // ------------------------------------------------------------
+  // Load Data
+  // ------------------------------------------------------------
+
+  @override
+  Future<void> loadData() async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
 
     try {
-      final customers = await customerController.getAll();
+      final customers = await _customerController.getAll();
+
+      if (!mounted) {
+        return;
+      }
 
       setState(() {
         _allCustomers = customers;
-        _isLoading = false;
+        isLoading = false;
       });
 
-      _openRequestedCustomer(customers);
-
-      _applyFilter(searchController.text);
+      await _openRequestedCustomer(customers);
     } catch (e) {
-      setState(() => _isLoading = false);
+      if (!mounted) {
+        return;
+      }
 
-      if (!mounted) return;
-      AppNotifier.error(context, "دریافت لیست مشتریان با خطا مواجه شد.");
+      setState(() {
+        isLoading = false;
+      });
+
+      AppNotifier.error(context, 'دریافت لیست مشتریان با خطا مواجه شد.');
     }
   }
 
-  Future<void> _openRequestedCustomer(List<CustomerModel> customers) async {
-    final requestedCustomer = widget.customerToEdit;
-    if (_didOpenRequestedCustomer || requestedCustomer == null) return;
+  // ------------------------------------------------------------
+  // Search
+  // ------------------------------------------------------------
 
-    final customer = customers.cast<CustomerModel?>().firstWhere(
-      (item) => item?.id == requestedCustomer.id,
-      orElse: () => null,
-    );
-    if (customer == null) return;
-
-    _didOpenRequestedCustomer = true;
-    widget.onCustomerEditHandled?.call();
-    await Future<void>.delayed(Duration.zero);
-    if (!mounted) return;
-
-    final updatedCustomer = await CustomerDialog.show(
-      context,
-      customer: customer,
-    );
-    if (updatedCustomer == null || !mounted) return;
-
-    try {
-      await customerController.update(updatedCustomer);
-      if (!mounted) return;
-      AppNotifier.success(context, "اطلاعات مشتری با موفقیت ویرایش شد.");
-      await _loadCustomers();
-    } catch (e) {
-      if (!mounted) return;
-      AppNotifier.error(context, "ویرایش مشتری با خطا مواجه شد. دوباره تلاش کنید.");
-    }
+  @override
+  void onSearchChanged(String value) {
+    setState(() {});
   }
 
-  void _applyFilter(String value) {
-    final query = value.trim();
+  List<CustomerModel> get _filteredCustomers {
+    final query = searchController.text.trim();
 
     if (query.isEmpty) {
-      setState(() => _filteredCustomers = _allCustomers);
-      return;
+      return _allCustomers;
     }
 
-    final results = _allCustomers.where((customer) {
+    return _allCustomers.where((customer) {
       return customer.code.toString().contains(query) ||
           customer.fullName.contains(query) ||
           customer.phone.contains(query) ||
           customer.address.contains(query);
     }).toList();
-
-    setState(() => _filteredCustomers = results);
   }
 
-  List<List<Widget>> _buildRows() {
+  // ------------------------------------------------------------
+  // Add
+  // ------------------------------------------------------------
+
+  @override
+  Future<void> addItem() async {
+    final customer = await CustomerDialog.show(context);
+
+    if (customer == null) {
+      return;
+    }
+
+    try {
+      await _customerController.add(customer);
+
+      if (!mounted) {
+        return;
+      }
+
+      AppNotifier.success(context, 'مشتری با موفقیت ثبت شد.');
+
+      await loadData();
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      AppNotifier.error(
+        context,
+        'ثبت مشتری با خطا مواجه شد. دوباره تلاش کنید.',
+      );
+    }
+  }
+
+  // ------------------------------------------------------------
+  // Edit
+  // ------------------------------------------------------------
+
+  @override
+  Future<void> editItem(int index) async {
+    final customer = _filteredCustomers[index];
+
+    final updatedCustomer = await CustomerDialog.show(
+      context,
+      customer: customer,
+    );
+
+    if (updatedCustomer == null) {
+      return;
+    }
+
+    try {
+      await _customerController.update(updatedCustomer);
+
+      if (!mounted) {
+        return;
+      }
+
+      AppNotifier.success(context, 'اطلاعات مشتری با موفقیت ویرایش شد.');
+
+      await loadData();
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      AppNotifier.error(
+        context,
+        'ویرایش مشتری با خطا مواجه شد. دوباره تلاش کنید.',
+      );
+    }
+  }
+
+  // ------------------------------------------------------------
+  // Delete
+  // ------------------------------------------------------------
+
+  @override
+  Future<void> deleteItem(int index) async {
+    final customer = _filteredCustomers[index];
+
+    final confirmed = await CustomerDeleteDialog.show(context);
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await _customerController.remove(customer);
+
+      if (!mounted) {
+        return;
+      }
+
+      AppNotifier.success(context, 'مشتری با موفقیت حذف شد.');
+
+      await loadData();
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      AppNotifier.error(context, 'حذف مشتری با خطا مواجه شد.');
+    }
+  }
+
+  // ------------------------------------------------------------
+  // Rows
+  // ------------------------------------------------------------
+
+  @override
+  List<List<Widget>> get rows {
     return _filteredCustomers.map((customer) {
       return [
         Text(customer.code.toString()),
+
         Text(customer.fullName),
+
         Text(customer.phone),
+
         Text(customer.address),
 
         StatusBadge(
-          text: customer.isActive ? "فعال" : "غیرفعال",
+          text: customer.isActive ? 'فعال' : 'غیرفعال',
           type: customer.isActive
               ? StatusBadgeType.success
               : StatusBadgeType.warning,
@@ -144,140 +262,68 @@ class _CustomersPageState extends State<CustomersPage> {
     }).toList();
   }
 
-  Future<void> _addCustomer() async {
-    final CustomerModel? customer = await CustomerDialog.show(context);
+  // ------------------------------------------------------------
+  // Open Requested Customer
+  // ------------------------------------------------------------
 
-    if (customer == null) return;
+  Future<void> _openRequestedCustomer(List<CustomerModel> customers) async {
+    final requestedCustomer = widget.customerToEdit;
 
-    try {
-      await customerController.add(customer);
-
-      if (!mounted) return;
-      AppNotifier.success(context, "مشتری با موفقیت ثبت شد.");
-
-      await _loadCustomers();
-    } catch (e) {
-      if (!mounted) return;
-      AppNotifier.error(
-        context,
-        "ثبت مشتری با خطا مواجه شد. دوباره تلاش کنید.",
-      );
+    if (_didOpenRequestedCustomer || requestedCustomer == null) {
+      return;
     }
-  }
 
-  Future<void> _editCustomer(int index) async {
-    final customer = _filteredCustomers[index];
+    CustomerModel? customer;
+
+    for (final item in customers) {
+      if (item.id == requestedCustomer.id) {
+        customer = item;
+        break;
+      }
+    }
+
+    if (customer == null) {
+      return;
+    }
+
+    _didOpenRequestedCustomer = true;
+
+    widget.onCustomerEditHandled?.call();
+
+    await Future<void>.delayed(Duration.zero);
+
+    if (!mounted) {
+      return;
+    }
 
     final updatedCustomer = await CustomerDialog.show(
       context,
       customer: customer,
     );
 
-    if (updatedCustomer == null) return;
+    if (updatedCustomer == null || !mounted) {
+      return;
+    }
 
     try {
-      await customerController.update(updatedCustomer);
+      await _customerController.update(updatedCustomer);
 
-      if (!mounted) return;
-      AppNotifier.success(context, "اطلاعات مشتری با موفقیت ویرایش شد.");
+      if (!mounted) {
+        return;
+      }
 
-      await _loadCustomers();
+      AppNotifier.success(context, 'اطلاعات مشتری با موفقیت ویرایش شد.');
+
+      await loadData();
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
+
       AppNotifier.error(
         context,
-        "ویرایش مشتری با خطا مواجه شد. دوباره تلاش کنید.",
+        'ویرایش مشتری با خطا مواجه شد. دوباره تلاش کنید.',
       );
     }
-  }
-
-  Future<void> _deleteCustomer(int index) async {
-    final customer = _filteredCustomers[index];
-
-    final confirmed = await CustomerDeleteDialog.show(context);
-
-    if (!confirmed) return;
-
-    try {
-      await customerController.remove(customer);
-
-      if (!mounted) return;
-      AppNotifier.success(context, "مشتری با موفقیت حذف شد.");
-
-      await _loadCustomers();
-    } catch (e) {
-      if (!mounted) return;
-      AppNotifier.error(
-        context,
-        "حذف مشتری با خطا مواجه شد. دوباره تلاش کنید.",
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.background,
-      child: Column(
-        children: [
-          PageToolbar(
-            searchController: searchController,
-            searchHint: "جستجوی مشتری...",
-
-            showRefresh: true,
-            showFilter: true,
-
-            primaryButtonText: "مشتری جدید",
-
-            onPrimaryPressed: _addCustomer,
-            onRefreshPressed: _loadCustomers,
-
-            onSearchChanged: _applyFilter,
-          ),
-
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : AppTable(
-                    showDeleteAction: true,
-                    showEditAction: true,
-
-                    onEdit: _editCustomer,
-
-                    onDelete: _deleteCustomer,
-
-                    columns: const [
-                      AppTableColumn(
-                        title: "کد",
-                        width: AppTableSizes.code,
-                      ),
-                      AppTableColumn(
-                        title: "نام مشتری",
-                        width: AppTableSizes.name
-                      ),
-                      AppTableColumn(
-                        title: "شماره تماس",
-                        width: AppTableSizes.number,
-                      ),
-                      AppTableColumn(
-                        title: "آدرس",
-                        width: AppTableSizes.address,
-                      ),
-                      AppTableColumn(
-                        title: "وضعیت",
-                        width: AppTableSizes.status,
-                      ),
-                      AppTableColumn(
-                        title: "عملیات",
-                        width: AppTableSizes.actions,
-                      ),
-                    ],
-
-                    rows: _buildRows(),
-                  ),
-          ),
-        ],
-      ),
-    );
   }
 }
