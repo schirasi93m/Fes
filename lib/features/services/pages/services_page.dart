@@ -1,131 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart' as shamsi;
 
 import 'package:new_project_fes/core/network/api_client.dart';
 import 'package:new_project_fes/core/theme/app_colors.dart';
-import 'package:new_project_fes/core/theme/app_icons.dart';
-import 'package:new_project_fes/core/theme/app_radius.dart';
 import 'package:new_project_fes/core/theme/app_sizes.dart';
-import 'package:new_project_fes/core/theme/app_spacing.dart';
-import 'package:new_project_fes/core/widgets/app_checkbox.dart';
+import 'package:new_project_fes/core/widgets/base_table_page.dart';
 import 'package:new_project_fes/core/widgets/app_notifier.dart';
-import 'package:new_project_fes/core/widgets/app_selector.dart';
-import 'package:new_project_fes/core/widgets/app_text_field.dart';
-import 'package:new_project_fes/core/widgets/persian_calendar_picker.dart';
-import 'package:new_project_fes/core/widgets/status_toggle.dart';
-import 'package:new_project_fes/features/code_title/models/code_title_model.dart';
-import 'package:new_project_fes/features/code_title/repository/code_title_repository_api.dart';
-import 'package:new_project_fes/features/customers/models/customer_model.dart';
-import 'package:new_project_fes/features/customers/repository/customer_repository_api.dart';
-import 'package:new_project_fes/features/customers/widgets/customer_form_dialog.dart';
-import 'package:new_project_fes/features/extinguishers/controllers/extinguisher_controller.dart';
-import 'package:new_project_fes/features/extinguishers/models/extinguishers_model.dart';
-import 'package:new_project_fes/features/extinguishers/repository/extinguisher_repository_api.dart';
-import 'package:new_project_fes/features/extinguishers/widget/extinguisher_form_dialog.dart';
+import 'package:new_project_fes/core/widgets/app_table/app_table.dart';
+import 'package:new_project_fes/core/models/app_table_column.dart';
 
-class ServicesPage extends StatefulWidget {
-  const ServicesPage({super.key});
+import 'package:new_project_fes/features/services/model/service_model.dart';
+import 'package:new_project_fes/features/services/repository/services_api.dart';
+import 'package:new_project_fes/features/services/widgets/service_form_dialog.dart';
+
+class ServicesPage extends BaseTablePage {
+  const ServicesPage({super.key})
+      : super(searchHint: 'جستجوی سرویس...', primaryButtonText: 'سرویس جدید');
 
   @override
   State<ServicesPage> createState() => _ServicesPageState();
 }
 
-class _ServicesPageState extends State<ServicesPage> {
-  final CustomerRepositoryApi _customerRepository = CustomerRepositoryApi(
-    ApiClient(),
-  );
-  final ExtinguisherRepositoryApi _extinguisherRepository =
-      ExtinguisherRepositoryApi(ApiClient());
-  final ExtinguisherController _extinguisherController = ExtinguisherController(
-    ExtinguisherRepositoryApi(ApiClient()),
-  );
-  final CodeTitleRepositoryApi _codeTitleRepository = CodeTitleRepositoryApi(
-    ApiClient(),
-  );
+class _ServicesPageState extends BaseTablePageState<ServicesPage> {
+  final ServiceApi _serviceApi = ServiceApi(ApiClient());
 
-  List<CustomerModel> _customers = [];
-  List<ExtinguisherModel> _extinguishers = [];
-  List<CodeTitleModel> _extinguisherTypes = [];
-  CustomerModel? _selectedCustomer;
-  ExtinguisherModel? _selectedExtinguisher;
-  final TextEditingController _descriptionController = TextEditingController();
-  DateTime? _serviceDate;
-  DateTime? _nextServiceDate;
-  bool _isActive = true;
-  bool _needsValve = false;
-  bool _needsGauge = false;
-  bool _needsPipe = false;
+  List<ServiceModel> _services = [];
+  List<ServiceModel> _filteredServices = [];
+
   bool _isLoading = true;
 
-  List<ExtinguisherModel> get _customerExtinguishers {
-    final customerId = _selectedCustomer?.id;
-    if (customerId == null) {
-      return [];
-    }
-
-    return _extinguishers
-        .where((extinguisher) => extinguisher.customerId == customerId)
-        .toList();
-  }
-
-  String _extinguisherTypeName(ExtinguisherModel extinguisher) {
-    for (final type in _extinguisherTypes) {
-      if (type.id == extinguisher.typeId || type.code == extinguisher.typeId) {
-        return type.title;
-      }
-    }
-
-    return 'نوع نامشخص';
-  }
-
-  String _extinguisherSummary(ExtinguisherModel extinguisher) {
-    final capacity = extinguisher.capacity % 1 == 0
-        ? extinguisher.capacity.toInt().toString()
-        : extinguisher.capacity.toString();
-    final status = extinguisher.isActive ? 'فعال' : 'غیرفعال';
-
-    return '${_extinguisherTypeName(extinguisher)} $capacity کیلویی | $status';
-  }
-
-  String _customerSummary(CustomerModel customer) {
-    final extinguisherCount = _extinguishers
-        .where((extinguisher) => extinguisher.customerId == customer.id)
-        .length;
-
-    return '${customer.code} | تعداد: $extinguisherCount';
-  }
+  @override
+  bool get isLoading => _isLoading;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    loadData();
   }
 
   @override
-  void dispose() {
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadData() async {
+  Future<void> loadData() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final results = await Future.wait([
-        _customerRepository.getList(),
-        _extinguisherRepository.getList(),
-        _codeTitleRepository.getByCategoryId(2),
-      ]);
+      final services = await _serviceApi.getServices();
 
       if (!mounted) {
         return;
       }
 
       setState(() {
-        _customers = results[0] as List<CustomerModel>;
-        _extinguishers = results[1] as List<ExtinguisherModel>;
-        _extinguisherTypes = results[2] as List<CodeTitleModel>;
+        _services = services;
+        _filteredServices = services;
         _isLoading = false;
       });
     } catch (error) {
@@ -136,372 +64,170 @@ class _ServicesPageState extends State<ServicesPage> {
       setState(() {
         _isLoading = false;
       });
-      AppNotifier.error(context, 'دریافت اطلاعات سرویس‌ها با خطا مواجه شد.');
+
+      AppNotifier.error(context, 'دریافت لیست سرویس‌ها با خطا مواجه شد.');
     }
-  }
-
-  Future<void> _addCustomer() async {
-    final customer = await CustomerDialog.show(context);
-    if (customer == null) {
-      return;
-    }
-
-    try {
-      final savedCustomer = await _customerRepository.insert(customer);
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _customers = [..._customers, savedCustomer];
-        _selectedCustomer = savedCustomer;
-        _selectedExtinguisher = null;
-      });
-      AppNotifier.success(context, 'مشتری با موفقیت ثبت شد.');
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      AppNotifier.error(
-        context,
-        'ثبت مشتری با خطا مواجه شد. دوباره تلاش کنید.',
-      );
-    }
-  }
-
-  Future<void> _editCustomer() async {
-    final customer = _selectedCustomer;
-    if (customer == null) {
-      return;
-    }
-
-    final editedCustomer = await CustomerDialog.show(
-      context,
-      customer: customer,
-    );
-    if (editedCustomer == null) {
-      return;
-    }
-
-    try {
-      final savedCustomer = await _customerRepository.update(editedCustomer);
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _customers = _customers.map((item) {
-          return item.id == savedCustomer.id ? savedCustomer : item;
-        }).toList();
-        _selectedCustomer = savedCustomer;
-      });
-      AppNotifier.success(context, 'اطلاعات مشتری با موفقیت ویرایش شد.');
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      AppNotifier.error(
-        context,
-        'ویرایش مشتری با خطا مواجه شد. دوباره تلاش کنید.',
-      );
-    }
-  }
-
-  Future<void> _addExtinguisher() async {
-    final extinguisher = await ExtinguisherDialog.show(
-      context,
-      controller: _extinguisherController,
-    );
-    if (extinguisher == null) {
-      return;
-    }
-
-    await _loadData();
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _selectedCustomer = _customers.cast<CustomerModel?>().firstWhere(
-        (customer) => customer?.id == extinguisher.customerId,
-        orElse: () => null,
-      );
-      _selectedExtinguisher = _extinguishers
-          .cast<ExtinguisherModel?>()
-          .firstWhere(
-            (item) => item?.id == extinguisher.id,
-            orElse: () => null,
-          );
-    });
-    AppNotifier.success(context, 'کپسول با موفقیت ثبت شد.');
-  }
-
-  Future<void> _editExtinguisher() async {
-    final extinguisher = _selectedExtinguisher;
-    if (extinguisher == null) {
-      return;
-    }
-
-    final updatedExtinguisher = await ExtinguisherDialog.show(
-      context,
-      controller: _extinguisherController,
-      extinguisher: extinguisher,
-    );
-    if (updatedExtinguisher == null) {
-      return;
-    }
-
-    await _loadData();
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _selectedCustomer = _customers.cast<CustomerModel?>().firstWhere(
-        (customer) => customer?.id == updatedExtinguisher.customerId,
-        orElse: () => null,
-      );
-      _selectedExtinguisher = _extinguishers
-          .cast<ExtinguisherModel?>()
-          .firstWhere(
-            (item) => item?.id == updatedExtinguisher.id,
-            orElse: () => null,
-          );
-    });
-    AppNotifier.success(context, 'اطلاعات کپسول با موفقیت ویرایش شد.');
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.background,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: AppSizes.responsiveDialogWidth(context),
-                  ),
-                  child: Card(
-                    margin: EdgeInsets.zero,
-                    color: AppColors.surface,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.card),
-                      side: BorderSide(color: AppColors.border),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(AppIcons.service, color: AppColors.primary),
-                              const SizedBox(width: AppSpacing.sm),
-                              Text(
-                                'انتخاب اطلاعات سرویس',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          AppSelector<CustomerModel>(
-                            label: 'مشتری',
-                            hint: 'مشتری را انتخاب کنید',
-                            requiredField: true,
-                            value: _selectedCustomer,
-                            items: _customers,
-                            itemLabel: (customer) => customer.fullName,
-                            secondaryItemLabel: _customerSummary,
-                            primaryHeader: 'عنوان',
-                            secondaryHeader: 'کد | تعداد کپسول',
-                            searchable: true,
-                            searchHint: 'جستجوی مشتری...',
-                            showAddButton: true,
-                            showEditButton: true,
-                            onAddPressed: _addCustomer,
-                            onEditPressed: _editCustomer,
-                            onChanged: (customer) {
-                              setState(() {
-                                _selectedCustomer = customer;
-                                _selectedExtinguisher = null;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          AppSelector<ExtinguisherModel>(
-                            label: 'کپسول',
-                            hint: _selectedCustomer == null
-                                ? 'ابتدا مشتری را انتخاب کنید'
-                                : 'کپسول را انتخاب کنید',
-                            requiredField: true,
-                            enabled: _selectedCustomer != null,
-                            value: _selectedExtinguisher,
-                            items: _customerExtinguishers,
-                            itemLabel: (extinguisher) =>
-                                extinguisher.serialNumber,
-                            secondaryItemLabel: _extinguisherSummary,
-                            primaryHeader: 'شماره سریال',
-                            secondaryHeader: 'نوع | وضعیت کپسول',
-                            searchable: true,
-                            searchHint: 'جستجوی کپسول...',
-                            showAddButton: true,
-                            showEditButton: true,
-                            onAddPressed: _addExtinguisher,
-                            onEditPressed: _editExtinguisher,
-                            onChanged: (extinguisher) {
-                              setState(() {
-                                _selectedExtinguisher = extinguisher;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: MyPersianCalendar(
-                                  label: 'تاریخ سرویس',
-                                  requiredField: true,
-                                  value: _serviceDate,
-                                  onChanged: (date) {
-                                    setState(() {
-                                      _serviceDate = date;
-                                    });
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: AppSpacing.md),
-                              Expanded(
-                                child: MyPersianCalendar(
-                                  label: 'تاریخ سرویس بعدی',
-                                  requiredField: true,
-                                  value: _nextServiceDate,
-                                  onChanged: (date) {
-                                    setState(() {
-                                      _nextServiceDate = date;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          AppTextField(
-                            controller: _descriptionController,
-                            label: 'توضیحات',
-                            hint: 'توضیحات سرویس را وارد کنید',
-                            maxLines: 3,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              border: Border.all(color: AppColors.border),
-                              borderRadius: BorderRadius.circular(
-                                AppRadius.card,
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.fromLTRB(
-                                    AppSpacing.md,
-                                    AppSpacing.sm,
-                                    AppSpacing.md,
-                                    0,
-                                  ),
-                                  child: Text('موارد موردنیاز سرویس'),
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: AppCheckbox(
-                                        value: _needsValve,
-                                        label: 'شیر',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _needsValve = value;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: AppCheckbox(
-                                        value: _needsGauge,
-                                        label: 'درجه',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _needsGauge = value;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: AppCheckbox(
-                                        value: _needsPipe,
-                                        label: 'میل آب',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _needsPipe = value;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: AppCheckbox(
-                                        value: _needsValve,
-                                        label: 'پودر',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _needsValve = value;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: AppCheckbox(
-                                        value: _needsGauge,
-                                        label: 'شیلنگ',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _needsGauge = value;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(children: [
-                                  
-                                ],
-                              ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          StatusToggle(
-                            value: _isActive,
-                            title: 'وضعیت سرویس',
-                            onChanged: (value) {
-                              setState(() {
-                                _isActive = value;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+  void onSearchChanged(String value) {
+    final query = value.trim();
+
+    setState(() {
+      _filteredServices = query.isEmpty
+          ? _services
+          : _services.where((service) {
+              return service.id.toString().contains(query) ||
+                  service.customerId.toString().contains(query) ||
+                  service.extinguisherId.toString().contains(query);
+            }).toList();
+    });
+  }
+
+  @override
+  Future<void> onPrimaryPressed() async {
+    final service = await ServiceDialog.show(context);
+
+    if (service == null || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _services = [..._services, service];
+      _filteredServices = [..._filteredServices, service];
+    });
+
+    AppNotifier.success(context, 'سرویس با موفقیت ثبت شد.');
+  }
+
+  Future<void> _editService(int index) async {
+    final service = _filteredServices[index];
+    final updatedService = await ServiceDialog.show(
+      context,
+      service: service,
+    );
+
+    if (updatedService == null || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _services = _services
+          .map((item) => item.id == updatedService.id ? updatedService : item)
+          .toList();
+      _filteredServices = _filteredServices
+          .map((item) => item.id == updatedService.id ? updatedService : item)
+          .toList();
+    });
+    AppNotifier.success(context, 'سرویس با موفقیت ویرایش شد.');
+  }
+
+  Future<void> _deleteService(int index) async {
+    final service = _filteredServices[index];
+    final serviceId = service.id;
+
+    if (serviceId == null) {
+      AppNotifier.error(context, 'شناسه سرویس برای حذف موجود نیست.');
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('حذف سرویس'),
+          content: const Text('آیا از حذف این سرویس مطمئن هستید؟'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('انصراف'),
             ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('حذف'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    try {
+      await _serviceApi.deleteService(serviceId);
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _services.removeWhere((item) => item.id == serviceId);
+        _filteredServices.removeWhere((item) => item.id == serviceId);
+      });
+      AppNotifier.success(context, 'سرویس با موفقیت حذف شد.');
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      AppNotifier.error(context, 'حذف سرویس با خطا مواجه شد.');
+    }
+  }
+
+  @override
+  Widget buildTable(BuildContext context) {
+    final rows = _filteredServices.map((service) {
+      final requestedItems = [
+        if (service.needsValve) 'شیر',
+        if (service.needsGauge) 'درجه',
+        if (service.needsPipe) 'میل آب',
+        if (service.needsPowder) 'پودر',
+        if (service.needsHose) 'شیلنگ',
+      ];
+
+      return [
+        Text(service.id?.toString() ?? '-'),
+
+        Text(service.customerId.toString()),
+
+        Text(service.extinguisherId.toString()),
+
+        Text(shamsi.Jalali.fromDateTime(service.serviceDate).formatCompactDate()),
+
+        Text(shamsi.Jalali.fromDateTime(service.nextServiceDate).formatCompactDate()),
+
+        Text(requestedItems.isEmpty ? '-' : requestedItems.join('، ')),
+      ];
+    }).toList();
+
+    return AppTable(
+                    showEditAction: true,
+                    showDeleteAction: true,
+                    onEdit: _editService,
+                    onDelete: _deleteService,
+                    columns: const [
+                      AppTableColumn(title: 'شناسه', width: AppTableSizes.code),
+                      AppTableColumn(title: 'مشتری', width: AppTableSizes.code),
+                      AppTableColumn(title: 'کپسول', width: AppTableSizes.code),
+                      AppTableColumn(
+                        title: 'تاریخ سرویس',
+                        width: AppTableSizes.date,
+                      ),
+                      AppTableColumn(
+                        title: 'سرویس بعدی',
+                        width: AppTableSizes.date,
+                      ),
+                      AppTableColumn(
+                        title: 'موارد موردنیاز',
+                        width: AppTableSizes.name,
+                      ),
+                      AppTableColumn(
+                        title: 'عملیات',
+                        width: AppTableSizes.actions,
+                      ),
+                    ],
+                    rows: rows,
     );
   }
 }

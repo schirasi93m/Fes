@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart' as shamsi;
 
 import 'package:new_project_fes/core/models/app_table_column.dart';
 import 'package:new_project_fes/core/network/api_client.dart';
@@ -253,7 +253,7 @@ class _ExtinguisherPageState extends State<ExtinguisherPage> {
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('yyyy/MM/dd').format(date);
+    return shamsi.Jalali.fromDateTime(date).formatCompactDate();
   }
 
   List<List<Widget>> _buildRows() {
