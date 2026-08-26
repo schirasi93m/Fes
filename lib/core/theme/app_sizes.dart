@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_spacing.dart';
+
 class AppSizes {
   AppSizes._();
 
@@ -35,20 +37,28 @@ class AppSizes {
   // Widths
   static const double drawerWidth = 280;
   static const double dialogWidth = 900;
+  static const double dialogHorizontalInset = AppSpacing.md * 2;
+
+  // Responsive breakpoints
+  static const double mobileBreakpoint = 700;
+  static const double formStackBreakpoint = 600;
+  static const double headerCompactBreakpoint = 420;
+  static const double footerCompactBreakpoint = 360;
+  static const double sidebarCompactBreakpoint = 1100;
+  static const double toolbarCompactBreakpoint = 900;
 
   static double responsiveDialogWidth(
     BuildContext context, {
     double maxWidth = dialogWidth,
-    double minWidth = 320,
   }) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final availableWidth = screenWidth - 32;
+    final availableWidth = screenWidth - dialogHorizontalInset;
 
-    if (availableWidth <= 0) {
+    if (availableWidth.isNegative) {
       return maxWidth;
     }
 
-    return availableWidth.clamp(minWidth, maxWidth);
+    return availableWidth > maxWidth ? maxWidth : availableWidth;
   }
 
   // Icon Sizes

@@ -1,6 +1,8 @@
 class AppSpacing {
   AppSpacing._(); // جلوگیری از ساختن نمونه
 
+  static const double none = 0;
+
   // Extra Small
   static const double xs = 4;
 
