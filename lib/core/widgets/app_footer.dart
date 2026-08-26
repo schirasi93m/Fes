@@ -14,8 +14,13 @@ class AppFooter extends StatelessWidget {
       height: AppSizes.footerHeight,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       color: AppColors.footerBackground,
-      child: Row(
-        children: [
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow =
+              constraints.maxWidth < AppSizes.footerCompactBreakpoint;
+
+          return Row(
+            children: [
           Text(
             "نسخه 1.0.0",
             style: AppTextStyles.bodySmall.copyWith(
@@ -25,13 +30,16 @@ class AppFooter extends StatelessWidget {
 
           const Spacer(),
 
-          Text(
-            "© Imen Shahr FES",
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.sidebarTextSecondary,
+          if (!isNarrow)
+            Text(
+              "© Imen Shahr FES",
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.sidebarTextSecondary,
+              ),
             ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }

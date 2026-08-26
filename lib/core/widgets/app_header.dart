@@ -24,8 +24,13 @@ class AppHeader extends StatelessWidget {
         color: AppColors.headerBackground,
         boxShadow: AppShadows.card,
       ),
-      child: Row(
-        children: [
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow =
+              constraints.maxWidth < AppSizes.headerCompactBreakpoint;
+
+          return Row(
+            children: [
           //------------------------
           // Menu
           //------------------------
@@ -35,7 +40,7 @@ class AppHeader extends StatelessWidget {
             type: AppButtonType.text,
           ),
 
-          const SizedBox(width: AppSpacing.lg),
+          SizedBox(width: isNarrow ? AppSpacing.sm : AppSpacing.lg),
 
           //------------------------
           // Title
@@ -44,9 +49,9 @@ class AppHeader extends StatelessWidget {
 
           const Spacer(),
 
-          const ApiStatusIndicator(),
+          if (!isNarrow) const ApiStatusIndicator(),
 
-          const SizedBox(width: AppSpacing.md),
+          if (!isNarrow) const SizedBox(width: AppSpacing.md),
 
           //------------------------
           // Notification
@@ -60,8 +65,10 @@ class AppHeader extends StatelessWidget {
           //------------------------
           // Center
           //------------------------
-          const SizedBox(width: AppSpacing.md),
-        ],
+          if (!isNarrow) const SizedBox(width: AppSpacing.md),
+            ],
+          );
+        },
       ),
     );
   }

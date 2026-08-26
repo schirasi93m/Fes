@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:new_project_fes/core/theme/app_colors.dart';
+import 'package:new_project_fes/core/theme/app_sizes.dart';
 import 'package:new_project_fes/core/widgets/app_footer.dart';
 import 'package:new_project_fes/core/widgets/app_header.dart';
 import 'package:new_project_fes/core/widgets/app_sidebar.dart';
@@ -32,6 +33,7 @@ class _MainScreenState extends State<MainScreen> {
 
   bool sidebarExpanded = true;
   CustomerModel? _customerToEdit;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String get pageTitle {
     switch (selectedIndex) {
@@ -110,35 +112,39 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final isCompact = constraints.maxWidth < 1100;
+            final useDrawerNavigation =
+                constraints.maxWidth < AppSizes.mobileBreakpoint;
+            final useCompactRail =
+                constraints.maxWidth < AppSizes.sidebarCompactBreakpoint;
 
             return Column(
               children: [
                 AppHeader(
                   title: pageTitle,
                   onMenuPressed: () {
-                    setState(() {
-                      sidebarExpanded = !sidebarExpanded;
-                    });
+                    if (useDrawerNavigation) {
+                      _scaffoldKey.currentState?.openEndDrawer();
+                      return;
+                    }
+
+                    setState(() => sidebarExpanded = !sidebarExpanded);
                   },
                 ),
 
                 Expanded(
                   child: Row(
                     children: [
-                      AppSidebar(
-                        expanded: isCompact ? false : sidebarExpanded,
-                        selectedIndex: selectedIndex,
-                        onItemSelected: (index) {
-                          setState(() {
-                            selectedIndex = index;
-                          });
-                        },
-                      ),
+                      if (!useDrawerNavigation)
+                        AppSidebar(
+                          expanded: useCompactRail ? false : sidebarExpanded,
+                          selectedIndex: selectedIndex,
+                          onItemSelected: _selectPage,
+                        ),
 
                       Expanded(child: _buildPage()),
                     ],
@@ -151,6 +157,29 @@ class _MainScreenState extends State<MainScreen> {
           },
         ),
       ),
+      endDrawer: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth >= AppSizes.mobileBreakpoint) {
+            return const SizedBox.shrink();
+          }
+
+          return Drawer(
+            width: AppSizes.drawerWidth,
+            child: AppSidebar(
+              expanded: true,
+              selectedIndex: selectedIndex,
+              onItemSelected: (index) {
+                _selectPage(index);
+                Navigator.of(context).pop();
+              },
+            ),
+          );
+        },
+      ),
     );
+  }
+
+  void _selectPage(int index) {
+    setState(() => selectedIndex = index);
   }
 }
