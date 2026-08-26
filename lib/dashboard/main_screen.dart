@@ -4,11 +4,16 @@ import 'package:new_project_fes/core/theme/app_colors.dart';
 import 'package:new_project_fes/core/widgets/app_footer.dart';
 import 'package:new_project_fes/core/widgets/app_header.dart';
 import 'package:new_project_fes/core/widgets/app_sidebar.dart';
+import 'package:new_project_fes/dashboard/dashboar_page.dart';
 
-import 'package:new_project_fes/features/customers/pages/customers_page.dart';
 import 'package:new_project_fes/features/customers/models/customer_model.dart';
+import 'package:new_project_fes/features/customers/pages/customers_page.dart';
+
+
 import 'package:new_project_fes/features/extinguishers/page/extinguisher_page.dart';
+
 import 'package:new_project_fes/features/services/pages/services_page.dart';
+
 import 'package:new_project_fes/playground/component_playground.dart';
 
 class MainScreen extends StatefulWidget {
@@ -31,40 +36,41 @@ class _MainScreenState extends State<MainScreen> {
   int selectedIndex = 0;
 
   bool sidebarExpanded = true;
+
   CustomerModel? _customerToEdit;
 
   String get pageTitle {
     switch (selectedIndex) {
       case 0:
-        return "داشبورد";
+        return 'داشبورد';
 
       case 1:
-        return "مشتریان";
+        return 'مشتریان';
 
       case 2:
-        return "کپسول ها";
+        return 'کپسول ها';
 
       case 3:
-        return "سرویس‌ها";
+        return 'سرویس‌ها';
 
       case 4:
-        return "گزارشات";
+        return 'گزارشات';
 
       case 5:
-        return "تنظیمات";
+        return 'تنظیمات';
 
       case 6:
-        return "کامپونت ها ";
+        return 'کامپونت ها';
 
       default:
-        return "";
+        return '';
     }
   }
 
   Widget _buildPage() {
     switch (selectedIndex) {
       case 0:
-        return const Center(child: Text("داشبورد"));
+        return const DashboardPage();
 
       case 1:
         return CustomersPage(
@@ -93,12 +99,11 @@ class _MainScreenState extends State<MainScreen> {
         return const ServicesPage();
 
       case 4:
-        return const Center(child: Text("گزارشات"));
+        return const Center(child: Text('گزارشات'));
 
       case 5:
-        return const Center(child: Text("تنظیمات"));
+        return const Center(child: Text('تنظیمات'));
 
-        
       case 6:
         return const ComponentShowcase();
 
