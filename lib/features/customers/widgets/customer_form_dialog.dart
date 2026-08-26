@@ -108,14 +108,16 @@ class _CustomerDialogState extends State<CustomerDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.surface,
+      insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
 
       title: Text(isEditMode ? "ویرایش مشتری" : "مشتری جدید"),
 
       content: SizedBox(
         width: AppSizes.responsiveDialogWidth(context),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             AppTextField(
               requiredField: true,
               controller: codeController,
@@ -156,7 +158,8 @@ class _CustomerDialogState extends State<CustomerDialog> {
                 });
               },
             ),
-          ],
+            ],
+          ),
         ),
       ),
 
