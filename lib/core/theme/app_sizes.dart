@@ -39,6 +39,12 @@ class AppSizes {
   static const double dialogWidth = 900;
   static const double dialogHorizontalInset = AppSpacing.md * 2;
 
+  /// Minimum width for AppSelector's dropdown menu on wide screens.
+  /// Kept separate from dialogWidth on purpose - dialogWidth being 900
+  /// used to double as this menu's minimum, which forced the popup to
+  /// 900px on any field/screen narrower than that.
+  static const double selectorMenuMinWidth = 320;
+
   // Responsive breakpoints
   static const double mobileBreakpoint = 700;
   static const double formStackBreakpoint = 600;

@@ -126,11 +126,22 @@ class _AppSelectorState<T> extends State<AppSelector<T>> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final menuWidth = constraints.maxWidth.isFinite
-            ? constraints.maxWidth < AppSizes.dialogWidth
-                  ? AppSizes.dialogWidth
-                  : constraints.maxWidth
-            : AppSizes.dialogWidth;
+        final screenWidth = MediaQuery.sizeOf(context).width;
+        // The popup should never claim more room than the screen has.
+        // This used to force the menu to a fixed 900px (AppSizes.dialogWidth)
+        // on every field narrower than that - i.e. on virtually every
+        // phone and most tablets, since it fired whenever the field
+        // itself was narrower than 900px. The popup rendered half
+        // off-screen as a result.
+        final maxMenuWidth = screenWidth - (AppSpacing.lg * 2);
+        final desiredMenuWidth = constraints.maxWidth.isFinite
+            ? (constraints.maxWidth < AppSizes.selectorMenuMinWidth
+                  ? AppSizes.selectorMenuMinWidth
+                  : constraints.maxWidth)
+            : AppSizes.selectorMenuMinWidth;
+        final menuWidth = desiredMenuWidth > maxMenuWidth
+            ? maxMenuWidth
+            : desiredMenuWidth;
         MenuController? menuController;
         final query = _normalize(_searchQuery);
         final filteredItems = query.isEmpty
