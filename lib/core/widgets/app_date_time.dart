@@ -51,13 +51,11 @@ class _AppDateTimeState extends State<AppDateTime> {
     return intl.DateFormat('HH:mm:ss').format(_dateTime);
   }
 
-
   String get _date {
     final jalali = Jalali.fromDateTime(_dateTime);
 
     return _toPersianDigits(jalali.formatFullDate());
-  } 
-
+  }
 
   String _toPersianDigits(String value) {
     const englishDigits = '0123456789';
