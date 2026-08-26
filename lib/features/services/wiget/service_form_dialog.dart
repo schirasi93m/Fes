@@ -461,6 +461,7 @@ class _ServiceDialogState extends State<ServiceDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.surface,
+      insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
 
       title: Text(isEditMode ? 'ویرایش سرویس' : 'سرویس جدید'),
 
@@ -545,37 +546,44 @@ class _ServiceDialogState extends State<ServiceDialog> {
 
                     const SizedBox(height: AppSpacing.lg),
 
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: MyPersianCalendar(
-                            label: 'تاریخ سرویس',
-                            requiredField: true,
-                            value: _serviceDate,
-                            onChanged: (date) {
-                              setState(() {
-                                _serviceDate = date;
-                              });
-                            },
-                          ),
-                        ),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final serviceDate = MyPersianCalendar(
+                          label: 'تاریخ سرویس',
+                          requiredField: true,
+                          value: _serviceDate,
+                          onChanged: (date) {
+                            setState(() => _serviceDate = date);
+                          },
+                        );
+                        final nextServiceDate = MyPersianCalendar(
+                          label: 'تاریخ سرویس بعدی',
+                          requiredField: true,
+                          value: _nextServiceDate,
+                          onChanged: (date) {
+                            setState(() => _nextServiceDate = date);
+                          },
+                        );
 
-                        const SizedBox(width: AppSpacing.md),
+                        if (constraints.maxWidth < AppSizes.formStackBreakpoint) {
+                          return Column(
+                            children: [
+                              serviceDate,
+                              const SizedBox(height: AppSpacing.md),
+                              nextServiceDate,
+                            ],
+                          );
+                        }
 
-                        Expanded(
-                          child: MyPersianCalendar(
-                            label: 'تاریخ سرویس بعدی',
-                            requiredField: true,
-                            value: _nextServiceDate,
-                            onChanged: (date) {
-                              setState(() {
-                                _nextServiceDate = date;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: serviceDate),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(child: nextServiceDate),
+                          ],
+                        );
+                      },
                     ),
 
                     const SizedBox(height: AppSpacing.md),
@@ -609,9 +617,10 @@ class _ServiceDialogState extends State<ServiceDialog> {
                             child: Text('موارد موردنیاز سرویس'),
                           ),
 
-                          Row(
+                          Wrap(
                             children: [
-                              Expanded(
+                              SizedBox(
+                                width: AppSpacing.bigSpace,
                                 child: AppCheckbox(
                                   value: _needsValve,
                                   label: 'شیر',
@@ -623,7 +632,8 @@ class _ServiceDialogState extends State<ServiceDialog> {
                                 ),
                               ),
 
-                              Expanded(
+                              SizedBox(
+                                width: AppSpacing.bigSpace,
                                 child: AppCheckbox(
                                   value: _needsGauge,
                                   label: 'درجه',
@@ -635,7 +645,8 @@ class _ServiceDialogState extends State<ServiceDialog> {
                                 ),
                               ),
 
-                              Expanded(
+                              SizedBox(
+                                width: AppSpacing.bigSpace,
                                 child: AppCheckbox(
                                   value: _needsPipe,
                                   label: 'میل آب',
@@ -647,7 +658,8 @@ class _ServiceDialogState extends State<ServiceDialog> {
                                 ),
                               ),
 
-                              Expanded(
+                              SizedBox(
+                                width: AppSpacing.bigSpace,
                                 child: AppCheckbox(
                                   value: _needsPowder,
                                   label: 'پودر',
@@ -659,7 +671,8 @@ class _ServiceDialogState extends State<ServiceDialog> {
                                 ),
                               ),
 
-                              Expanded(
+                              SizedBox(
+                                width: AppSpacing.bigSpace,
                                 child: AppCheckbox(
                                   value: _needsHose,
                                   label: 'شیلنگ',

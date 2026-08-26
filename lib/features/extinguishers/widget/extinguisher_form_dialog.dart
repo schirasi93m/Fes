@@ -324,13 +324,27 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
   }
 
   Widget _formRow({required Widget first, required Widget second}) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(child: first),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(child: second),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < AppSizes.formStackBreakpoint) {
+          return Column(
+            children: [
+              first,
+              const SizedBox(height: AppSpacing.md),
+              second,
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: first),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(child: second),
+          ],
+        );
+      },
     );
   }
 
@@ -469,6 +483,7 @@ class _ExtinguisherDialogState extends State<ExtinguisherDialog> {
       canPop: !_isSubmitting,
       child: AlertDialog(
         backgroundColor: AppColors.surface,
+        insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
 
         title: Text(isEditMode ? 'ویرایش کپسول' : 'کپسول جدید'),
 

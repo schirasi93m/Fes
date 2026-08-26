@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../models/app_table_column.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_sizes.dart';
+import '../theme/app_spacing.dart';
 import 'app_page_toolbar.dart';
 import 'app_table/app_table.dart';
 
@@ -60,6 +62,9 @@ abstract class AppFormPageState<T extends AppFormPage> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
+    final isNarrow =
+        MediaQuery.sizeOf(context).width < AppSizes.formStackBreakpoint;
+
     return Container(
       color: AppColors.background,
       child: Column(
@@ -77,16 +82,19 @@ abstract class AppFormPageState<T extends AppFormPage> extends State<T> {
           ),
 
           Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : AppTable(
-                    showEditAction: showEditAction,
-                    showDeleteAction: showDeleteAction,
-                    onEdit: editItem,
-                    onDelete: deleteItem,
-                    columns: columns,
-                    rows: rows,
-                  ),
+            child: Padding(
+              padding: EdgeInsets.all(isNarrow ? AppSpacing.none : AppSpacing.sm),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : AppTable(
+                      showEditAction: showEditAction,
+                      showDeleteAction: showDeleteAction,
+                      onEdit: editItem,
+                      onDelete: deleteItem,
+                      columns: columns,
+                      rows: rows,
+                    ),
+            ),
           ),
         ],
       ),

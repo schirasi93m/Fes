@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_icons.dart';
+import '../theme/app_sizes.dart';
 import '../theme/app_spacing.dart';
 import 'app_button.dart';
 import 'app_search_box.dart';
@@ -62,22 +63,31 @@ class PageToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.all(
+        MediaQuery.sizeOf(context).width < AppSizes.formStackBreakpoint
+            ? AppSpacing.md
+            : AppSpacing.lg,
+      ),
       decoration: BoxDecoration(
         color: AppColors.background,
         border: Border(bottom: BorderSide(color: AppColors.border)),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final isCompact = constraints.maxWidth < 900;
+          final isCompact =
+              constraints.maxWidth < AppSizes.toolbarCompactBreakpoint;
+          final isNarrow =
+              constraints.maxWidth < AppSizes.headerCompactBreakpoint;
 
           final search = showSreachBox
               ? isCompact
-                    ? ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: 220,
-                          maxWidth: 360,
-                        ),
+                    ? SizedBox(
+                        width: isNarrow
+                            ? constraints.maxWidth
+                            : constraints.maxWidth.clamp(
+                                AppTableSizes.actions + AppTableSizes.code,
+                                AppSizes.notificationWidth,
+                              ),
                         child: AppSearchBox(
                           controller: searchController!,
                           hintText: searchHint,
@@ -139,7 +149,7 @@ class PageToolbar extends StatelessWidget {
 
           if (isCompact) {
             return Wrap(
-              alignment: WrapAlignment.end,
+              alignment: WrapAlignment.start,
               crossAxisAlignment: WrapCrossAlignment.center,
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
