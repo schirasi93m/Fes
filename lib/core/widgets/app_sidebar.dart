@@ -12,12 +12,14 @@ class AppSidebar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemSelected;
   final bool expanded;
+  final VoidCallback? onLogout;
 
   const AppSidebar({
     super.key,
     required this.selectedIndex,
     required this.onItemSelected,
     this.expanded = true,
+    this.onLogout,
   });
 
   @override
@@ -79,6 +81,12 @@ class AppSidebar extends StatelessWidget {
                   ),
 
                   _buildItem(
+                    index: 6,
+                    title: "کاربران",
+                    icon: AppIcons.user,
+                  ),
+
+                  _buildItem(
                     index: 2,
                     title: "کپسول ها",
                     icon: AppIcons.extinguisher,
@@ -128,6 +136,7 @@ class AppSidebar extends StatelessWidget {
                 title: "خروج",
                 icon: AppIcons.logout,
                 isLogout: true,
+                onTap: onLogout,
               ),
             ),
           ],
@@ -141,6 +150,7 @@ class AppSidebar extends StatelessWidget {
     required String title,
     required IconData icon,
     bool isLogout = false,
+    VoidCallback? onTap,
   }) {
     final bool selected = selectedIndex == index;
 
@@ -148,7 +158,7 @@ class AppSidebar extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.button),
-        onTap: () => onItemSelected(index),
+        onTap: onTap ?? () => onItemSelected(index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           height: AppSizes.buttonHeightMd,

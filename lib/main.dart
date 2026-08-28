@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:new_project_fes/core/theme/app_theme.dart';
-import 'package:new_project_fes/dashboard/main_screen.dart';
-//import 'package:new_project_fes/dashboard/main_screen.dart';
+import 'package:new_project_fes/features/auth/pages/login_page.dart';
 //import 'package:new_project_fes/playground/component_playground.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Date and Time Pickers',
+      title: 'ایمن شهر',
       locale: const Locale("fa", "IR"),
       supportedLocales: const [Locale("fa", "IR"), Locale("en", "US")],
       localizationsDelegates: const [
@@ -36,7 +35,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 255, 0, 0)),
       ),*/
       //  home: const MyPersianCalendar(), //
-      home: const MainScreen(),
+      home: const LoginPage(),
     );
   }
 }
