@@ -14,6 +14,8 @@ import 'package:new_project_fes/features/customers/pages/customers_page.dart';
 import 'package:new_project_fes/features/extinguishers/page/extinguisher_page.dart';
 
 import 'package:new_project_fes/features/services/pages/services_page.dart';
+import 'package:new_project_fes/features/users/pages/users_page.dart';
+import 'package:new_project_fes/features/auth/pages/login_page.dart';
 
 import 'package:new_project_fes/playground/component_playground.dart';
 
@@ -31,6 +33,7 @@ enum NavigationPage {
   services,
   reports,
   settings,
+  users,
 }
 
 class _MainScreenState extends State<MainScreen> {
@@ -62,6 +65,9 @@ class _MainScreenState extends State<MainScreen> {
         return 'تنظیمات';
 
       case 6:
+        return 'کاربران';
+
+      case 7:
         return 'کامپونت ها';
 
       default:
@@ -107,6 +113,9 @@ class _MainScreenState extends State<MainScreen> {
         return const Center(child: Text('تنظیمات'));
 
       case 6:
+        return const UsersPage();
+
+      case 7:
         return const ComponentShowcase();
 
       default:
@@ -149,6 +158,7 @@ class _MainScreenState extends State<MainScreen> {
                           expanded: useCompactRail ? false : sidebarExpanded,
                           selectedIndex: selectedIndex,
                           onItemSelected: _selectPage,
+                          onLogout: _logout,
                         ),
 
                       Expanded(child: _buildPage()),
@@ -177,10 +187,18 @@ class _MainScreenState extends State<MainScreen> {
                 _selectPage(index);
                 Navigator.of(context).pop();
               },
+              onLogout: _logout,
             ),
           );
         },
       ),
+    );
+  }
+
+  void _logout() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (route) => false,
     );
   }
 
