@@ -158,20 +158,21 @@ class _TextFieldWithClearState extends State<_TextFieldWithClear> {
               ),
         hintText: widget.hint,
         prefixIcon: widget.prefixIcon,
-        suffixIcon: hasText && widget.enabled && !widget.readOnly
-            ? IconButton(
-                onPressed: () {
-                  widget.controller.clear();
-                  widget.onChanged?.call('');
-                },
-                splashRadius: 18,
-                tooltip: 'پاک کردن مقدار',
-                icon: Icon(
-                  AppIcons.close,
-                  color: AppColors.textSecondary,
-                ),
-              )
-            : widget.suffixIcon,
+        suffixIcon: widget.suffixIcon ??
+            (hasText && widget.enabled && !widget.readOnly
+                ? IconButton(
+                    onPressed: () {
+                      widget.controller.clear();
+                      widget.onChanged?.call('');
+                    },
+                    splashRadius: 18,
+                    tooltip: 'پاک کردن مقدار',
+                    icon: Icon(
+                      AppIcons.close,
+                      color: AppColors.textSecondary,
+                    ),
+                  )
+                : null),
         enabled: widget.enabled,
         filled: true,
         fillColor: AppColors.surface,
