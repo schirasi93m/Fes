@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:new_project_fes/core/models/app_table_column.dart';
 import 'package:new_project_fes/core/network/api_client.dart';
 import 'package:new_project_fes/core/theme/app_sizes.dart';
+import 'package:new_project_fes/core/widgets/app_date_utils.dart';
 import 'package:new_project_fes/core/widgets/app_delete_dialog.dart';
 import 'package:new_project_fes/core/widgets/app_form_page.dart';
 import 'package:new_project_fes/core/widgets/app_notifier.dart';
@@ -337,6 +337,6 @@ class _ExtinguisherPageState extends AppFormPageState<ExtinguisherPage> {
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('yyyy/MM/dd').format(date);
+    return AppDateUtils.toPersianDate(date);
   }
 }

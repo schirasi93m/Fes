@@ -5,6 +5,7 @@ import 'package:new_project_fes/core/theme/app_colors.dart';
 import 'package:new_project_fes/core/theme/app_icons.dart';
 import 'package:new_project_fes/core/theme/app_radius.dart';
 import 'package:new_project_fes/core/theme/app_spacing.dart';
+import 'package:new_project_fes/core/widgets/app_date_utils.dart';
 import 'package:new_project_fes/core/widgets/status_badge.dart';
 
 import 'package:new_project_fes/features/code_title/models/code_title_model.dart';
@@ -172,15 +173,9 @@ class _DashboardPageState extends State<DashboardPage> {
     return _getExtinguisherType(typeId)?.title ?? '---';
   }
 
-  String _formatDate(DateTime? date) {
-    if (date == null) {
-      return '---';
-    }
-
-    return '${date.year.toString().padLeft(4, '0')}/'
-        '${date.month.toString().padLeft(2, '0')}/'
-        '${date.day.toString().padLeft(2, '0')}';
-  }
+String _formatDate(DateTime? date) {
+  return AppDateUtils.toPersianDate(date);
+}
 
   bool _isToday(DateTime? date) {
     if (date == null) {

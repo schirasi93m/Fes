@@ -1,5 +1,6 @@
 import 'package:new_project_fes/core/enums/entity_state.dart';
 import 'package:new_project_fes/core/models/entity_base.dart';
+import 'package:new_project_fes/core/widgets/app_date_utils.dart';
 
 class ExtinguisherModel extends EntityBase {
   final int? id;
@@ -69,9 +70,9 @@ class ExtinguisherModel extends EntityBase {
       'capacity': capacity,
       'location': location,
       'customerId': customerId,
-      'productionDate': productionDate?.toIso8601String(),
-      'lastServiceDate': lastServiceDate?.toIso8601String(),
-      'nextServiceDate': nextServiceDate?.toIso8601String(),
+      'productionDate': AppDateUtils.toApiDate(productionDate),
+      'lastServiceDate': AppDateUtils.toApiDate(lastServiceDate),
+      'nextServiceDate': AppDateUtils.toApiDate(nextServiceDate),
       'isActive': isActive,
       'entityState': entityState.index,
     };
@@ -105,11 +106,7 @@ class ExtinguisherModel extends EntityBase {
   }
 
   static DateTime? _parseDate(dynamic value) {
-    if (value == null) {
-      return null;
-    }
-
-    return DateTime.tryParse(value.toString());
+    return AppDateUtils.fromApiDate(value);
   }
 
   static List<int>? _parseRowVersion(dynamic value) {

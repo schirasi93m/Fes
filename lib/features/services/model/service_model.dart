@@ -1,3 +1,5 @@
+import 'package:new_project_fes/core/widgets/app_date_utils.dart';
+
 class ServiceModel {
   int? id;
 
@@ -33,8 +35,8 @@ class ServiceModel {
     final data = <String, dynamic>{
       'customerId': customerId,
       'extinguisherId': extinguisherId,
-      'serviceDate': serviceDate.toIso8601String(),
-      'nextServiceDate': nextServiceDate.toIso8601String(),
+      'serviceDate': AppDateUtils.toApiDate(serviceDate),
+      'nextServiceDate': AppDateUtils.toApiDate(nextServiceDate),
       'description': description,
       'needsValve': needsValve,
       'needsGauge': needsGauge,
@@ -56,8 +58,8 @@ class ServiceModel {
       id: json['id'],
       customerId: json['customerId'],
       extinguisherId: json['extinguisherId'],
-      serviceDate: DateTime.parse(json['serviceDate']),
-      nextServiceDate: DateTime.parse(json['nextServiceDate']),
+      serviceDate: AppDateUtils.fromApiDate(json['serviceDate'])!,
+      nextServiceDate: AppDateUtils.fromApiDate(json['nextServiceDate'])!,
       description: json['description'],
       needsValve: json['needsValve'] ?? false,
       needsGauge: json['needsGauge'] ?? false,

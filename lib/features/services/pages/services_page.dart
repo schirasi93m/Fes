@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:new_project_fes/core/models/app_table_column.dart';
 import 'package:new_project_fes/core/network/api_client.dart';
 import 'package:new_project_fes/core/theme/app_sizes.dart';
+import 'package:new_project_fes/core/widgets/app_date_utils.dart';
 import 'package:new_project_fes/core/widgets/app_delete_dialog.dart';
 import 'package:new_project_fes/core/widgets/app_form_page.dart';
 import 'package:new_project_fes/core/widgets/app_notifier.dart';
@@ -344,9 +345,7 @@ class _ServicesPageState extends AppFormPageState<ServicesPage> {
   // ------------------------------------------------------------
 
   String _formatDate(DateTime date) {
-    return '${date.year.toString().padLeft(4, '0')}/'
-        '${date.month.toString().padLeft(2, '0')}/'
-        '${date.day.toString().padLeft(2, '0')}';
+    return AppDateUtils.toPersianDate(date);
   }
 
   // ------------------------------------------------------------
