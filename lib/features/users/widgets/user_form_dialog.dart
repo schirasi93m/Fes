@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:new_project_fes/core/theme/app_colors.dart';
 import 'package:new_project_fes/core/theme/app_icons.dart';
 import 'package:new_project_fes/core/theme/app_sizes.dart';
 import 'package:new_project_fes/core/theme/app_spacing.dart';
@@ -13,7 +14,10 @@ class UserFormDialog extends StatefulWidget {
 
   const UserFormDialog({super.key, this.user});
 
-  static Future<AppUserModel?> show(BuildContext context, {AppUserModel? user}) {
+  static Future<AppUserModel?> show(
+    BuildContext context, {
+    AppUserModel? user,
+  }) {
     return showDialog<AppUserModel>(
       context: context,
       barrierDismissible: false,
@@ -30,6 +34,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
   late final TextEditingController _fullNameController;
   late final TextEditingController _usernameController;
   late final TextEditingController _roleController;
+  late final TextEditingController _passwordController;
   bool _isActive = true;
 
   bool get _isEditing => widget.user != null;
@@ -40,6 +45,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
     final user = widget.user;
     _fullNameController = TextEditingController(text: user?.fullName ?? '');
     _usernameController = TextEditingController(text: user?.username ?? '');
+    _passwordController = TextEditingController(text: user?.password ?? '');
     _roleController = TextEditingController(text: user?.role ?? 'کاربر');
     _isActive = user?.isActive ?? true;
   }
@@ -48,6 +54,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
   void dispose() {
     _fullNameController.dispose();
     _usernameController.dispose();
+    _passwordController.dispose();
     _roleController.dispose();
     super.dispose();
   }
@@ -61,6 +68,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
         id: user?.id ?? DateTime.now().microsecondsSinceEpoch,
         fullName: _fullNameController.text.trim(),
         username: _usernameController.text.trim(),
+        password: '',
         role: _roleController.text.trim(),
         isActive: _isActive,
       ),
@@ -70,6 +78,12 @@ class _UserFormDialogState extends State<UserFormDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      // این دو خط اضافه شد: بدون این‌ها، چون تم Material3 با
+      // ColorScheme.fromSeed ساخته شده، دیالوگ به‌صورت پیش‌فرض یه رنگ
+      // کمی متمایل (surface tint گرفته‌شده از رنگ اصلی برند) می‌گرفت،
+      // نه سفید خالصی که بقیه‌ی دیالوگ‌ها (Customer, Extinguisher) دارن.
+      backgroundColor: AppColors.surface,
+      insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       title: Text(_isEditing ? 'ویرایش کاربر' : 'کاربر جدید'),
       content: SizedBox(
         width: AppSizes.responsiveDialogWidth(context, maxWidth: 520),
@@ -99,10 +113,20 @@ class _UserFormDialogState extends State<UserFormDialog> {
               ),
               const SizedBox(height: AppSpacing.md),
               AppTextField(
+                controller: _passwordController,
+                label: 'رمز عبور',
+                requiredField: true,
+                prefixIcon: const Icon(AppIcons.password),
+                validator: (value) => value == null || value.trim().isEmpty
+                    ? 'رمز عبور را وارد کنید.'
+                    : null,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              AppTextField(
                 controller: _roleController,
                 label: 'نقش کاربر',
                 requiredField: true,
-                prefixIcon: const Icon(AppIcons.key),
+                prefixIcon: const Icon(AppIcons.shieldUser),
                 validator: (value) => value == null || value.trim().isEmpty
                     ? 'نقش کاربر را وارد کنید.'
                     : null,
@@ -123,7 +147,10 @@ class _UserFormDialogState extends State<UserFormDialog> {
           type: AppButtonType.outlined,
           onPressed: () => Navigator.pop(context),
         ),
-        AppButton(text: _isEditing ? 'ذخیره تغییرات' : 'ثبت کاربر', onPressed: _save),
+        AppButton(
+          text: _isEditing ? 'ذخیره تغییرات' : 'ثبت کاربر',
+          onPressed: _save,
+        ),
       ],
     );
   }

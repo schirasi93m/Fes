@@ -86,8 +86,9 @@ class AppIcons {
   //==========================
 
   static const login = LucideIcons.logIn;
+  static const password = LucideIcons.keyRound;
   static const logout = LucideIcons.logOut;
-  static const key = LucideIcons.keyRound;
+  static const shieldUser = LucideIcons.shieldUser;
 
   //==========================
   // Misc
