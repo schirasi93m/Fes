@@ -16,11 +16,14 @@ import 'package:new_project_fes/features/extinguishers/page/extinguisher_page.da
 import 'package:new_project_fes/features/services/pages/services_page.dart';
 import 'package:new_project_fes/features/users/pages/users_page.dart';
 import 'package:new_project_fes/features/auth/pages/login_page.dart';
+import 'package:new_project_fes/features/auth/model/login_response_model.dart';
 
 import 'package:new_project_fes/playground/component_playground.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final LoginResponseModel user;
+
+  const MainScreen({super.key, required this.user});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -159,6 +162,7 @@ class _MainScreenState extends State<MainScreen> {
                           selectedIndex: selectedIndex,
                           onItemSelected: _selectPage,
                           onLogout: _logout,
+                          user: widget.user,
                         ),
 
                       Expanded(child: _buildPage()),
@@ -188,6 +192,7 @@ class _MainScreenState extends State<MainScreen> {
                 Navigator.of(context).pop();
               },
               onLogout: _logout,
+              user: widget.user,
             ),
           );
         },

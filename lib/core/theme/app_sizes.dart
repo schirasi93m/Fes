@@ -74,7 +74,10 @@ class AppSizes {
   static const double iconXl = 32;
 
   // Logo
-  static const double logoSize = 48;
+
+  static const double logoSmall = 48;
+  static const double logoMedium = 64;
+  static const double logoLarge = 80;
 
   // Avatar
   static const double avatarSm = 32;

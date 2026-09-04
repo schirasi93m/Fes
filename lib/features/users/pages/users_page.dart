@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 import 'package:new_project_fes/core/models/app_table_column.dart';
+import 'package:new_project_fes/core/network/api_client.dart';
 import 'package:new_project_fes/core/theme/app_sizes.dart';
-import 'package:new_project_fes/core/widgets/app_delete_dialog.dart';
 import 'package:new_project_fes/core/widgets/app_form_page.dart';
 import 'package:new_project_fes/core/widgets/app_notifier.dart';
 import 'package:new_project_fes/core/widgets/status_badge.dart';
 import 'package:new_project_fes/features/users/models/app_user_model.dart';
+import 'package:new_project_fes/features/users/repository/user_repository_api.dart';
 import 'package:new_project_fes/features/users/widgets/user_form_dialog.dart';
 
 class UsersPage extends AppFormPage {
@@ -17,24 +19,57 @@ class UsersPage extends AppFormPage {
 }
 
 class _UsersPageState extends AppFormPageState<UsersPage> {
-  final List<AppUserModel> _users = [
-    const AppUserModel(
-      id: 1,
-      fullName: 'مصطفی شیرازی',
-      username: 'mostafa.shirazi',
-      password: '',
-      role: 'مدیر سیستم',
-      isActive: true,
-    ),
-    const AppUserModel(
-      id: 2,
-      fullName: 'سارا احمدی',
-      username: 'sara.ahmadi',
-      password: '',
-      role: 'کارشناس خدمات',
-      isActive: true,
-    ),
-  ];
+  late final UserRepositoryApi _userRepository;
+
+  bool _repositoryInitialized = false;
+
+  List<AppUserModel> _users = [];
+  @override
+  bool get showEditAction => false;
+
+  @override
+  bool get showDeleteAction => false;
+
+  String? _errorMessage;
+  bool _errorShown = false;
+
+  @override
+  void initState() {
+    try {
+      debugPrint('[UsersPage.initState] شروع initialization');
+
+      _userRepository = UserRepositoryApi(ApiClient());
+
+      _repositoryInitialized = true;
+
+      debugPrint('[UsersPage.initState] UserRepository initialize شد');
+    } catch (e) {
+      debugPrint('[UsersPage.initState] خطا در ایجاد UserRepository: $e');
+
+      _repositoryInitialized = false;
+      _errorMessage = 'خطا در راه‌اندازی مخزن کاربران: $e';
+    }
+
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_errorMessage != null && !_errorShown) {
+      _errorShown = true;
+
+      final errorMsg = _errorMessage;
+      _errorMessage = null;
+
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (mounted && errorMsg != null) {
+          AppNotifier.error(context, errorMsg);
+        }
+      });
+    }
+  }
 
   @override
   String get pageTitle => 'کاربران';
@@ -50,7 +85,11 @@ class _UsersPageState extends AppFormPageState<UsersPage> {
 
   List<AppUserModel> get _filteredUsers {
     final query = searchController.text.trim().toLowerCase();
-    if (query.isEmpty) return _users;
+
+    if (query.isEmpty) {
+      return _users;
+    }
+
     return _users.where((user) {
       return user.fullName.toLowerCase().contains(query) ||
           user.username.toLowerCase().contains(query) ||
@@ -64,60 +103,126 @@ class _UsersPageState extends AppFormPageState<UsersPage> {
     AppTableColumn(title: 'نام کاربری', width: 190),
     AppTableColumn(title: 'نقش', width: 180),
     AppTableColumn(title: 'وضعیت', width: AppTableSizes.status),
-    AppTableColumn(title: 'عملیات', width: AppTableSizes.actions),
   ];
 
   @override
-  List<List<Widget>> get rows => _filteredUsers.map((user) {
-    return [
-      Text(user.fullName),
-      Text(user.username, textDirection: TextDirection.ltr),
-      Text(user.role),
-      StatusBadge(
-        text: user.isActive ? 'فعال' : 'غیرفعال',
-        type: user.isActive ? StatusBadgeType.success : StatusBadgeType.warning,
-      ),
-      const SizedBox.shrink(),
-    ];
-  }).toList();
+  List<List<Widget>> get rows {
+    return _filteredUsers.map((user) {
+      return [
+        Text(user.fullName),
+
+        Text(user.username, textDirection: TextDirection.ltr),
+
+        Text(user.role),
+
+        StatusBadge(
+          text: user.isActive ? 'فعال' : 'غیرفعال',
+          type: user.isActive
+              ? StatusBadgeType.success
+              : StatusBadgeType.warning,
+        ),
+      ];
+    }).toList();
+  }
 
   @override
   Future<void> loadData() async {
-    await Future<void>.delayed(const Duration(milliseconds: 150));
-    if (mounted) setState(() => isLoading = false);
+    _errorShown = false;
+
+    if (!_repositoryInitialized) {
+      debugPrint('[UsersPage.loadData] خطا: UserRepository initialize نشده');
+
+      if (mounted) {
+        setState(() {
+          _errorMessage = _errorMessage ?? 'خطا: مخزن کاربران آماده نیست';
+
+          isLoading = false;
+        });
+      }
+
+      return;
+    }
+
+    try {
+      debugPrint('[UsersPage.loadData] شروع درخواست GET /Users');
+
+      final users = await _userRepository.getList();
+
+      debugPrint('[UsersPage.loadData] دریافت ${users.length} کاربر از API');
+
+      if (mounted) {
+        setState(() {
+          _users = users;
+          _errorMessage = null;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint(
+        '[UsersPage.loadData] خطا: $e '
+        '(نوع: ${e.runtimeType})',
+      );
+
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'خطا در دریافت لیست کاربران: $e';
+
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
   Future<void> addItem() async {
-    final user = await UserFormDialog.show(context);
-    if (user == null || !mounted) return;
-    setState(() => _users.add(user));
-    AppNotifier.success(context, 'کاربر جدید با موفقیت ثبت شد.');
+    if (!_repositoryInitialized) {
+      debugPrint('[UsersPage.addItem] خطا: UserRepository initialize نشده');
+
+      if (mounted) {
+        AppNotifier.error(context, 'خطا: مخزن کاربران آماده نیست');
+      }
+
+      return;
+    }
+
+    try {
+      final user = await UserFormDialog.show(context);
+
+      if (user == null || !mounted) {
+        return;
+      }
+
+      setState(() {
+        _users.add(user);
+      });
+
+      AppNotifier.success(context, 'کاربر جدید با موفقیت ثبت شد.');
+    } catch (e) {
+      debugPrint('[UsersPage.addItem] خطا: $e');
+
+      if (mounted) {
+        AppNotifier.error(context, 'خطا در اضافه کردن کاربر: $e');
+      }
+    }
   }
+
+  // ---------------------------------------------------------------------------
+  // ویرایش و حذف در این صفحه غیرفعال هستند.
+  // این متدها به دلیل قرارداد AppFormPageState باید وجود داشته باشند.
+  // ---------------------------------------------------------------------------
 
   @override
   Future<void> editItem(int index) async {
-    final selectedUser = _filteredUsers[index];
-    final user = await UserFormDialog.show(context, user: selectedUser);
-    if (user == null || !mounted) return;
-    final userIndex = _users.indexWhere((item) => item.id == selectedUser.id);
-    setState(() => _users[userIndex] = user);
-    AppNotifier.success(context, 'اطلاعات کاربر با موفقیت ویرایش شد.');
+    // ویرایش کاربر در این صفحه غیرفعال است.
   }
 
   @override
   Future<void> deleteItem(int index) async {
-    final user = _filteredUsers[index];
-    final confirmed = await AppDeleteDialog.show(
-      context,
-      title: 'حذف کاربر',
-      message: 'آیا از حذف «${user.fullName}» مطمئن هستید؟',
-    );
-    if (!confirmed || !mounted) return;
-    setState(() => _users.removeWhere((item) => item.id == user.id));
-    AppNotifier.success(context, 'کاربر با موفقیت حذف شد.');
+    // حذف کاربر در این صفحه غیرفعال است.
   }
 
   @override
-  void onSearchChanged(String value) => setState(() {});
+  void onSearchChanged(String value) {
+    setState(() {});
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class ApiClient {
   late final Dio _dio;
@@ -13,6 +14,26 @@ class ApiClient {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+        },
+      ),
+    );
+    
+    debugPrint('[ApiClient] ایجاد شد با baseUrl: http://localhost:5058/api');
+    
+    // Add logging interceptor
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          debugPrint('[API] ${options.method.toUpperCase()} ${options.path}');
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          debugPrint('[API] Response: ${response.statusCode} ${response.requestOptions.path}');
+          return handler.next(response);
+        },
+        onError: (error, handler) {
+          debugPrint('[API] Error: ${error.requestOptions.path} - ${error.message}');
+          return handler.next(error);
         },
       ),
     );

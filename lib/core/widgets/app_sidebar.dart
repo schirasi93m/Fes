@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:new_project_fes/core/theme/app_assets.dart';
 import 'package:new_project_fes/core/widgets/app_sidebar_user.dart';
+import 'package:new_project_fes/features/auth/model/login_response_model.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_icons.dart';
@@ -13,6 +15,7 @@ class AppSidebar extends StatelessWidget {
   final ValueChanged<int> onItemSelected;
   final bool expanded;
   final VoidCallback? onLogout;
+  final LoginResponseModel user;
 
   const AppSidebar({
     super.key,
@@ -20,6 +23,7 @@ class AppSidebar extends StatelessWidget {
     required this.onItemSelected,
     this.expanded = true,
     this.onLogout,
+    required this.user,
   });
 
   @override
@@ -36,12 +40,12 @@ class AppSidebar extends StatelessWidget {
             //------------------------------------
             // Header
             //------------------------------------
-            Icon(
-              AppIcons.extinguisher,
-              color: AppColors.primary,
-              size: AppSizes.logoSize,
+            Image.asset(
+              AppAssets.logo,
+              width: AppSizes.logoLarge,
+              height: AppSizes.logoLarge,
+              fit: BoxFit.contain,
             ),
-
             if (expanded) ...[
               const SizedBox(height: AppSpacing.md),
               Text("ایمن شهر", style: AppTextStyles.sidebarTitle),
@@ -80,11 +84,7 @@ class AppSidebar extends StatelessWidget {
                     icon: AppIcons.customer,
                   ),
 
-                  _buildItem(
-                    index: 6,
-                    title: "کاربران",
-                    icon: AppIcons.user,
-                  ),
+                  _buildItem(index: 6, title: "کاربران", icon: AppIcons.user),
 
                   _buildItem(
                     index: 2,
@@ -98,24 +98,11 @@ class AppSidebar extends StatelessWidget {
                     icon: AppIcons.service,
                   ),
 
-                  /*  _buildItem(index: 4, title: "گزارشات", icon: AppIcons.report),
-
-                  _buildItem(
-                    index: 5,
-                    title: "تنظیمات",
-                    icon: AppIcons.settings,
-                  ),
-                  _buildItem(
-                    index: 6,
-                    title: "کامپونت هاش",
-                    icon: AppIcons.playground,
-                  ),
-*/
                   const SizedBox(height: AppSpacing.lg),
                   AppSidebarUser(
                     expanded: expanded,
-                    fullName: "مصطفی شیرازی",
-                    role: "مدیر سیستم",
+                    fullName: user.fullName,
+                    role: user.role,
                   ),
                   const SizedBox(height: AppSpacing.md),
                 ],

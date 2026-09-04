@@ -25,6 +25,7 @@ dependencies:
   json_annotation: ^4.9.0
   intl: ^0.20.2
   responsive_framework: ^1.5.1
+  shamsi_date: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -50,6 +51,6 @@ flutter:
       fonts:
         - asset: assets/fonts/BTitrBd.ttf   
           weight: 700
-
   assets:
     - assets/fonts/
+    - assets/images/
